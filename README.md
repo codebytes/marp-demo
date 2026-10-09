@@ -56,6 +56,9 @@ same `npm run build` command with **Marp CLI 4.5.1** and Playwright's Chromium.
 On Linux, install browser system libraries with
 `npx playwright install --with-deps chromium`. For PDF export, `CHROME_PATH` can
 override Chromium with an installed Chrome/Chromium executable.
+The Actions build pins Ubuntu 22.04 so Chromium can keep its sandbox enabled.
+On newer Ubuntu hosts with AppArmor restrictions on downloaded browsers, use
+`CHROME_PATH` with system-installed Chrome rather than disabling its sandbox.
 
 The build replaces the generated `build` directory and exports exactly:
 
