@@ -1,0 +1,20 @@
+{
+  "name": "marp-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A showcase for interactive Marp presentations.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "preview": "node scripts/preview.mjs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "4.5.1",
+    "playwright": "1.64.0"
+  }
+}

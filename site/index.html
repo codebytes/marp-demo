@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A playground for Marp presentations. Explore an animated CI/CD deck with native SVG, interactive playback, and a printable PDF.">
+  <meta name="theme-color" content="#0b111b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236ee7ca'/%3E%3Ctext x='10' y='43' font-family='monospace' font-size='36' fill='%230b111b'%3Em/%3C/text%3E%3C/svg%3E">
+  <title>marp-demo | Markdown, meet motion</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #0b111b;
+      --panel: #111c2b;
+      --foreground: #edf3fc;
+      --muted: #a2b2c8;
+      --border: #30435a;
+      --mint: #6ee7ca;
+      --lavender: #b4c3ff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(ellipse at 90% 0, #1e334b, transparent 55%), var(--background); color: var(--foreground); font-family: "Segoe UI", Arial, sans-serif; line-height: 1.6; }
+    a { color: var(--mint); text-underline-offset: 4px; }
+    a:focus-visible { outline: 3px solid var(--lavender); outline-offset: 5px; }
+    .wrap { width: min(1160px, calc(100% - 48px)); margin: auto; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--border); }
+    .brand { display: flex; align-items: center; gap: 12px; color: var(--foreground); font-size: 19px; font-weight: 650; text-decoration: none; }
+    .mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--mint); color: var(--background); font: 700 22px monospace; }
+    .source-link { font-size: 14px; text-decoration: none; }
+    .intro { position: relative; padding: 70px 0 48px; }
+    .eyebrow { margin: 0 0 20px; color: var(--mint); font-size: 12px; font-weight: 650; letter-spacing: 2px; }
+    h1 { margin: 0; font-size: clamp(48px, 7.6vw, 90px); font-weight: 650; letter-spacing: -4px; line-height: 1.03; }
+    h1 span { color: var(--mint); }
+    .intro-copy { max-width: 650px; margin: 25px 0 0; color: var(--muted); font-size: 21px; }
+    .collection-label { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; color: var(--muted); font: 12px/1.5 Consolas, monospace; letter-spacing: 1px; }
+    .collection-label span:first-child { color: var(--foreground); }
+    .demo { display: grid; grid-template-columns: 1.05fr 1fr; overflow: hidden; border: 1px solid #42576e; border-radius: 22px; background: var(--panel); box-shadow: 0 25px 65px #0003; }
+    .preview { display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 32px; background: radial-gradient(ellipse at 40% 35%, #1f393e, transparent 70%), #0e1926; border-right: 1px solid var(--border); }
+    .preview-label { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 11px/1.5 Consolas, monospace; letter-spacing: 1px; }
+    .preview-label span:first-child { color: var(--mint); }
+    .preview svg { display: block; width: 100%; height: auto; margin: 12px 0; }
+    .preview figcaption { border-top: 1px solid var(--border); padding-top: 18px; color: var(--muted); font-size: 14px; }
+    .preview figcaption strong { color: var(--mint); font-weight: 600; }
+    .demo-copy { padding: 36px; }
+    .demo-kind { margin: 0 0 15px; color: var(--lavender); font-size: 11px; font-weight: 650; letter-spacing: 1.7px; }
+    h2 { margin: 0; font-size: clamp(29px, 3vw, 38px); font-weight: 650; letter-spacing: -1px; line-height: 1.15; }
+    .description { margin: 18px 0 22px; color: var(--muted); font-size: 17px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 0 0 27px; list-style: none; }
+    .tags li { border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-size: 12px; padding: 4px 10px; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 15px; min-height: 46px; border: 1px solid #51657b; border-radius: 8px; padding: 10px 15px; color: var(--foreground); font-size: 14px; font-weight: 650; text-decoration: none; }
+    .button.primary { border-color: var(--mint); background: var(--mint); color: #0b2523; }
+    .button:hover { border-color: var(--mint); filter: brightness(1.1); }
+    .jump { display: inline-block; margin-top: 18px; font-size: 13px; }
+    .details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px; margin: 34px 0; }
+    .details h3 { margin: 0 0 8px; font-size: 17px; font-weight: 600; }
+    .details p { margin: 0; color: var(--muted); font-size: 15px; }
+    .detail-number { display: block; margin-bottom: 12px; color: var(--mint); font: 12px Consolas, monospace; }
+    .format-note { padding: 19px 22px; margin: 0; border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-size: 14px; }
+    .format-note strong { color: var(--foreground); font-weight: 600; }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; margin-top: 46px; padding: 24px 0 32px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+    @media (max-width: 850px) {
+      .demo { grid-template-columns: 1fr; }
+      .preview { border-right: 0; border-bottom: 1px solid var(--border); }
+      .preview svg { max-height: 290px; }
+      .details { gap: 24px; }
+    }
+    @media (max-width: 560px) {
+      .wrap { width: calc(100% - 32px); }
+      .topbar { padding: 20px 0; gap: 12px; }
+      .source-link { font-size: 12px; }
+      .intro { padding: 45px 0 35px; }
+      h1 { letter-spacing: -2.5px; }
+      .intro-copy { font-size: 18px; }
+      .collection-label { font-size: 10px; letter-spacing: 0; }
+      .preview, .demo-copy { padding: 23px; }
+      .details { grid-template-columns: 1fr; gap: 26px; }
+      .links .button { flex: 1 0 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <a class="brand" href="./"><span class="mark" aria-hidden="true">m/</span>marp-demo</a>
+      <a class="source-link" href="https://github.com/codebytes/marp-demo">View source on GitHub <span aria-hidden="true">&nearr;</span></a>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">A PLAYGROUND FOR PRESENTATIONS</p>
+        <h1 id="page-title">Markdown.<br><span>Meet motion.</span></h1>
+        <p class="intro-copy">Small files. Big possibilities. Experiments that push Marp beyond the slide, starting with a delivery platform you can put in motion.</p>
+      </section>
+
+      <div class="collection-label"><span>01 / THE FIRST EXPERIMENT</span><span>4 SLIDES &middot; HTML + PDF</span></div>
+      <article class="demo" aria-labelledby="demo-title">
+        <figure class="preview">
+          <div class="preview-label"><span>DELIVERY SYSTEM</span><span>DEMO / 0142</span></div>
+          <svg viewBox="0 0 480 260" role="img" aria-labelledby="preview-title preview-desc">
+            <title id="preview-title">A delivery path from commit to production</title>
+            <desc id="preview-desc">A build branches into parallel tests and security checks, then rejoins at an approval gate before release.</desc>
+            <g fill="none" stroke="#4d998d" stroke-width="2">
+              <path d="M51 133 H101 M179 133 H200 V74 H228 M200 133 V192 H228 M310 74 H337 V133 H365 M310 192 H337 V133 M395 133 H433"/>
+              <path d="M80 133 H98 M210 74 H225 M325 192 H337 V180" stroke="#6ee7ca" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <circle cx="36" cy="133" r="15" fill="#163a33" stroke="#6ee7ca" stroke-width="2"/>
+            <circle cx="36" cy="133" r="4" fill="#6ee7ca"/>
+            <g fill="#15273a" stroke="#51657b">
+              <rect x="101" y="101" width="78" height="64" rx="13"/>
+              <rect x="228" y="44" width="82" height="60" rx="13"/>
+              <rect x="228" y="162" width="82" height="60" rx="13"/>
+            </g>
+            <g fill="#edf3fc" font-family="Segoe UI, Arial, sans-serif" font-size="13" text-anchor="middle">
+              <text x="140" y="129">Build</text>
+              <text x="269" y="78">Tests</text>
+              <text x="269" y="196">Security</text>
+            </g>
+            <text x="140" y="148" fill="#a2b2c8" font-family="Consolas, monospace" font-size="9" text-anchor="middle">ONE ARTIFACT</text>
+            <circle cx="380" cy="133" r="15" fill="#473923" stroke="#ffd38a" stroke-width="2"/>
+            <path d="M376 132 V128 a4 4 0 0 1 8 0 V132 M375 132 H385 V140 H375 Z" fill="none" stroke="#ffd38a" stroke-width="1.5"/>
+            <circle cx="448" cy="133" r="15" fill="#213a42" stroke="#6ee7ca" stroke-width="2"/>
+            <path d="m441 133 5 5 9-10" fill="none" stroke="#6ee7ca" stroke-width="2"/>
+            <g fill="#a2b2c8" font-family="Segoe UI, Arial, sans-serif" font-size="9" text-anchor="middle" letter-spacing="0.8">
+              <text x="36" y="168">COMMIT</text>
+              <text x="380" y="168">APPROVE</text>
+              <text x="448" y="168">RELEASE</text>
+            </g>
+          </svg>
+          <figcaption><strong>One artifact.</strong> A visible path to production.</figcaption>
+        </figure>
+        <div class="demo-copy">
+          <p class="demo-kind">INTERACTIVE / PLATFORM ENGINEERING</p>
+          <h2 id="demo-title">From commit<br>to confidence.</h2>
+          <p class="description">Follow a change through parallel checks, a human approval gate, and a progressive rollout. Pause the story, step through it, or see what happens when tests fail.</p>
+          <ul class="tags" aria-label="Demo features"><li>Native SVG</li><li>Local JavaScript</li><li>Playback controls</li></ul>
+          <div class="links">
+            <a class="button primary" href="animated.html">Open presentation <span aria-hidden="true">&rarr;</span></a>
+            <a class="button" href="Animated-CICD.pdf" download>Download PDF</a>
+          </div>
+          <a class="jump" href="animated.html#3">Jump to the simulation <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
+      <section class="details" aria-label="Inside the experiment">
+        <div><span class="detail-number">01 / FOLLOW</span><h3>See the system work.</h3><p>Moving signals connect each stage. Tests and security run in parallel; approval unlocks production.</p></div>
+        <div><span class="detail-number">02 / TAKE CONTROL</span><h3>Change the conversation.</h3><p>Pause, resume, replay, step, change speed, or choose a failing run. The demo waits for your release decision.</p></div>
+        <div><span class="detail-number">03 / MAKE IT YOURS</span><h3>Open the three layers.</h3><p>Markdown tells the story. CSS sets the scene. Browser-native JavaScript drives the timeline. No animation library.</p></div>
+      </section>
+      <p class="format-note"><strong>HTML is the interactive version.</strong> The PDF keeps a readable, static diagram. Reduced-motion preferences are respected; use Step to explore at your own pace.</p>
+    </main>
+    <footer>
+      <span>Built with <a href="https://marp.app/">Marp</a>. Made to be explored.</span>
+      <span><a href="https://github.com/codebytes/marp-demo/blob/main/LICENSE">MIT licensed</a> &middot; Visual inspiration: <a href="https://github.com/favourhong/Awesome-Marp">Awesome-Marp</a></span>
+    </footer>
+  </div>
+</body>
+</html>

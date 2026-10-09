@@ -1,0 +1,9 @@
+node_modules/
+build/
+slides/*.html
+slides/*.pdf
+slides/*.pptx
+slides/*.png
+test-results/
+playwright-report/
+.DS_Store
