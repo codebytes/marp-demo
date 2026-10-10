@@ -30,6 +30,7 @@ for (const [source, html] of [
   ["Async-Await", "async-await.html"],
   ["Throttling", "throttling.html"],
   ["Motion-Lab", "motion-lab.html"],
+  ["Style-Lab", "style-lab.html"],
 ]) {
   for (const [filename, options] of [
     [html, ["--bespoke.osc=false"]],

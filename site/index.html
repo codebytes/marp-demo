@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A playground for Marp presentations. Compare nine animation techniques in Motion Lab, or explore throttling, .NET async/await, AI-agent context, and CI/CD demos with readable PDFs.">
+  <meta name="description" content="A playground for Marp presentations. Restyle one slide eight ways in Style Lab, compare nine animation techniques in Motion Lab, or explore throttling, .NET async/await, AI-agent context, and CI/CD demos with readable PDFs.">
   <meta name="theme-color" content="#0b111b">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236ee7ca'/%3E%3Ctext x='10' y='43' font-family='monospace' font-size='36' fill='%230b111b'%3Em/%3C/text%3E%3C/svg%3E">
   <title>marp-demo | Markdown, meet motion</title>
@@ -44,6 +44,12 @@
     .throttle-demo .preview { background: radial-gradient(ellipse at 40% 35%, #453923, transparent 70%), #19191e; }
     .motion-demo { --mint: #ffb3a7; border-color: #946978; }
     .motion-demo .preview { background: radial-gradient(ellipse at 40% 35%, #4a3038, transparent 70%), #19141e; }
+    .style-demo { --mint: #ff8fcf; border-color: #8a6a83; }
+    .style-demo .preview { background: radial-gradient(ellipse at 70% 0, #f7f6f3, #e9e8e4 60%); border-right-color: #8a6a83; }
+    .style-demo .preview-label { color: #55524b; }
+    .style-demo .preview-label span:first-child { color: #1b1a17; }
+    .style-demo .preview figcaption { border-top-color: #cbc8bf; color: #55524b; }
+    .style-demo .preview figcaption strong { color: #1b1a17; }
     .preview { display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 32px; background: radial-gradient(ellipse at 40% 35%, #1f393e, transparent 70%), #0e1926; border-right: 1px solid var(--border); }
     .preview-label { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 11px/1.5 Consolas, monospace; letter-spacing: 1px; }
     .preview-label span:first-child { color: var(--mint); }
@@ -98,10 +104,42 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">A PLAYGROUND FOR PRESENTATIONS</p>
         <h1 id="page-title">Markdown.<br><span>Meet motion.</span></h1>
-        <p class="intro-copy">Small files. Big possibilities. Compare animation techniques, move between complete slide keyframes, or take control of an interactive simulation.</p>
+        <p class="intro-copy">Small files. Big possibilities. Restyle one slide eight ways, compare animation techniques, move between complete slide keyframes, or take control of an interactive simulation.</p>
       </section>
 
-      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>5 DECKS &middot; HTML + PDF</span></div>
+      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>6 DECKS &middot; HTML + PDF</span></div>
+      <article class="demo style-demo" data-deck="style" aria-labelledby="style-title">
+        <figure class="preview">
+          <div class="preview-label"><span>ONE SLIDE / EIGHT STYLES</span><span>DEMO / 06</span></div>
+          <svg viewBox="0 0 480 236" role="img" aria-labelledby="style-preview-title style-preview-desc">
+            <title id="style-preview-title">Eight framed swatches of the same slide in different styles</title>
+            <desc id="style-preview-desc">The house style, a risograph zine, a Swiss poster, a neo-brutalist sticker, a sketchnote, a blueprint, a broadsheet, and LaTeX Beamer, hung like small works on a gallery wall.</desc>
+            <g fill="#fbfaf8" stroke="#1b1a1726"><rect x="16" y="22" width="100" height="70"/><rect x="132" y="22" width="100" height="70"/><rect x="248" y="22" width="100" height="70"/><rect x="364" y="22" width="100" height="70"/><rect x="16" y="120" width="100" height="70"/><rect x="132" y="120" width="100" height="70"/><rect x="248" y="120" width="100" height="70"/><rect x="364" y="120" width="100" height="70"/></g>
+            <svg x="22" y="28" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#0b111b"/><text x="44" y="35" fill="#edf3fc" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" text-anchor="middle">Aa</text><rect x="22" y="43" width="44" height="2" fill="#6ee7ca"/></svg>
+            <svg x="138" y="28" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#f3ecdb"/><circle cx="34" cy="29" r="17" fill="#ff48b0" style="mix-blend-mode: multiply"/><circle cx="54" cy="29" r="17" fill="#0078bf" style="mix-blend-mode: multiply"/></svg>
+            <svg x="254" y="28" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#f5f3ee"/><circle cx="76" cy="12" r="30" fill="#e2231a"/><text x="8" y="40" fill="#111" font-family="Arial, sans-serif" font-size="26" font-weight="800" letter-spacing="-1">Aa</text></svg>
+            <svg x="370" y="28" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#ffde59"/><rect x="26" y="17" width="40" height="28" fill="#000"/><rect x="21" y="12" width="40" height="28" fill="#fff" stroke="#000" stroke-width="3"/><text x="41" y="32" fill="#000" font-family="Arial, sans-serif" font-size="15" font-weight="800" text-anchor="middle">Aa</text></svg>
+            <svg x="22" y="126" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#fdfcf7"/><rect x="14" y="26" width="38" height="8" fill="#ffe45c"/><path d="M14 30c8-6 14 4 22-1s12 2 16-2M58 16c10-1 18 1 20 0M58 16c-1 9 1 17 0 24M78 16c1 8-1 16 0 24M58 40c7 1 14-1 20 0" fill="none" stroke="#26282d" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg x="138" y="126" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#0f4b93"/><path d="M0 14.5h88M0 29.5h88M0 44.5h88M22.5 0v58M44.5 0v58M66.5 0v58" stroke="#ffffff" stroke-opacity=".18"/><rect x="18" y="20" width="52" height="20" fill="none" stroke="#e3efff" stroke-width="1.5"/><path d="M18 48h52M18 45v6M70 45v6" stroke="#e3efff" stroke-width="1.2"/></svg>
+            <svg x="254" y="126" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#ebe7dd"/><path d="M8 10h72M8 13h72" stroke="#1a1916" stroke-width="1.2"/><text x="44" y="38" fill="#1a1916" font-family="Georgia, Times New Roman, serif" font-size="22" font-weight="700" text-anchor="middle">Aa</text><path d="M8 46h20M34 46h20M60 46h20M8 50h20M34 50h20M60 50h20" stroke="#49453e" stroke-width="1"/></svg>
+            <svg x="370" y="126" width="88" height="58" viewBox="0 0 88 58"><rect width="88" height="58" fill="#fff"/><rect width="88" height="5" fill="#1b1b6b"/><rect y="5" width="88" height="11" fill="#3333b2"/><text x="44" y="40" fill="#3333b2" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">Aa</text><rect y="52" width="30" height="6" fill="#1b1b6b"/><rect x="30" y="52" width="29" height="6" fill="#3333b2"/><rect x="59" y="52" width="29" height="6" fill="#dcdcf2"/></svg>
+            <g font-family="Consolas, monospace" font-size="11" fill="#55524b" text-anchor="middle"><text x="240" y="222">SAME HTML / EIGHT STYLESHEETS</text></g>
+          </svg>
+          <figcaption><strong>Same words. Different worlds.</strong> Only the stylesheet changes.</figcaption>
+        </figure>
+        <div class="demo-copy">
+          <p class="demo-kind">VISUAL STYLE / 13 SLIDES / NEW</p>
+          <h2 id="style-title">Style Lab.<br>Same words, different worlds.</h2>
+          <p class="description">One slide of HTML, dressed eight ways: a risograph zine, a Swiss poster, neo-brutalism, a sketchnote, a blueprint, a broadsheet, and LaTeX Beamer, beside the house style. Then restyle it live.</p>
+          <ul class="tags" aria-label="Style Lab features"><li>Bundled open fonts</li><li>CSS-only textures</li><li>Live restyle morph</li></ul>
+          <div class="links">
+            <a class="button primary" href="style-lab.html">Open presentation <span aria-hidden="true">&rarr;</span></a>
+            <a class="button" href="Style-Lab.pdf" download>Download PDF</a>
+          </div>
+          <a class="jump" href="style-lab.html#11">Jump to the live restyle <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
       <article class="demo motion-demo" data-deck="motion" aria-labelledby="motion-title">
         <figure class="preview">
           <div class="preview-label"><span>ONE DIAGRAM / NINE TECHNIQUES</span><span>DEMO / 05</span></div>
@@ -118,7 +156,7 @@
           <figcaption><strong>Same diagram. Different verbs.</strong> Compare the mechanism, not the subject.</figcaption>
         </figure>
         <div class="demo-copy">
-          <p class="demo-kind">ANIMATION TECHNIQUES / 12 SLIDES / NEW</p>
+          <p class="demo-kind">ANIMATION TECHNIQUES / 12 SLIDES</p>
           <h2 id="motion-title">Motion Lab.<br>Make the difference visible.</h2>
           <p class="description">One small diagram, nine approaches. Compare CSS and SVG motion, masks, 3D, sprite frames, local video, Lottie vectors, and shared-element slide morphs.</p>
           <ul class="tags" aria-label="Motion Lab features"><li>Play / pause / replay</li><li>Locally packaged media</li><li>Complete static frames</li></ul>
