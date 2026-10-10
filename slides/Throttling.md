@@ -1,5 +1,6 @@
 ---
 marp: true
+lang: en
 theme: throttling
 paginate: true
 title: Throttle the burst

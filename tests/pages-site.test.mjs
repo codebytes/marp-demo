@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { after, before, test } from "node:test";
+import { inflateSync } from "node:zlib";
 import { chromium } from "playwright";
 import { createPreviewServer } from "../scripts/preview.mjs";
 
@@ -138,6 +139,37 @@ test("all PDFs, runtimes, and themes are included in the published package", asy
     const asset = await page.request.get(new URL(path, siteUrl).href);
     assert.equal(asset.status(), 200, path);
     assert.ok((await asset.body()).length > 100, `${path} must not be empty.`);
+  }
+});
+
+function pdfText(bytes) {
+  const text = bytes.toString("latin1");
+  // Chrome stores the catalog and page tree in compressed object streams.
+  const streams = [...text.matchAll(/stream\r?\n/g)].map(({ index, 0: marker }) => {
+    const start = index + marker.length;
+    try {
+      return inflateSync(bytes.subarray(start, text.indexOf("endstream", start))).toString("latin1");
+    } catch {
+      return "";
+    }
+  });
+  return [text, ...streams].join("\n");
+}
+
+test("every deck declares English and names its labelled groups, and every PDF is English with bookmarks", async (t) => {
+  const page = await openSite(t);
+  for (const deck of decks) {
+    await page.goto(new URL(deck.html, siteUrl).href);
+    const semantics = await page.evaluate(() => ({
+      lang: document.documentElement.lang,
+      slides: [...new Set([...document.querySelectorAll("section[id]")].map((section) => section.lang))],
+      unnamed: [...document.querySelectorAll("div[aria-label]:not([role])")].map((element) => element.className),
+    }));
+    assert.deepEqual(semantics, { lang: "en", slides: ["en"], unnamed: [] },
+      `${deck.html} must declare English rather than the build machine's locale, and give labelled containers a role.`);
+    const text = pdfText(await (await page.request.get(new URL(deck.pdf, siteUrl).href)).body());
+    assert.match(text, /\/Lang\s*\(en\)/, `${deck.pdf} must declare English.`);
+    assert.match(text, /\/Outlines\s+\d+\s+0\s+R/, `${deck.pdf} must carry bookmarks.`);
   }
 });
 

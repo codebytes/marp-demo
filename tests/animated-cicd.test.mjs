@@ -193,7 +193,7 @@ test("document visibility and reduced-motion changes suspend running playback", 
   assert.equal(await page.locator('.cicd-packet[data-active="true"]').count(), 0);
 });
 
-test("reduced motion starts idle and keyboard controls do not navigate the deck", async (t) => {
+test("reduced motion starts idle; Space and Enter stay on the controls, and arrow keys still change slides", async (t) => {
   const page = await openDeck(t);
   await page.waitForTimeout(200);
   assert.equal(await mode(page), "idle");
@@ -207,6 +207,8 @@ test("reduced motion starts idle and keyboard controls do not navigate the deck"
   await page.keyboard.press("Enter");
   assert.equal(await stage(page), "1");
   assert.equal(new URL(page.url()).hash, "#3");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForFunction(() => location.hash === "#4", null, { timeout: 3000 });
 });
 
 test("print, JavaScript-disabled, and presenter views retain the static diagram", async (t) => {

@@ -152,9 +152,10 @@ section.aw .aw-rule p { color: var(--aw-muted); font-size: 19px; margin-top: 10p
 @keyframes aw-beam { from { stroke-dashoffset: 25; } to { stroke-dashoffset: -270; } }
 @keyframes aw-io { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -64; } }
 @keyframes aw-arrive { from { opacity: 0.25; translate: 0 15px; } to { opacity: 1; translate: 0 0; } }
+/* All motion on a slide ends within five seconds of it appearing (WCAG 2.2.2), so nothing here may loop forever. */
 @media (prefers-reduced-motion: no-preference) {
-  section.aw-active .aw-cover-beam { animation: aw-beam 2.2s linear infinite; }
-  section.aw-active .aw-cover-io { animation: aw-io 2.8s linear infinite; }
+  section.aw-active .aw-cover-beam { animation: aw-beam 2.2s linear 2; }
+  section.aw-active .aw-cover-io { animation: aw-io 2.8s linear; }
   section.aw-active .aw-enter { animation: aw-arrive 850ms both; }
   section.aw-active .aw-enter:nth-child(2) { animation-delay: 200ms; }
   section.aw-active .aw-enter:nth-child(3) { animation-delay: 400ms; }

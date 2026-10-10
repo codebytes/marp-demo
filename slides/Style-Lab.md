@@ -1,5 +1,6 @@
 ---
 marp: true
+lang: en
 theme: style-lab
 paginate: true
 title: Style Lab

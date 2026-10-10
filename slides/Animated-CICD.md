@@ -1,5 +1,6 @@
 ---
 marp: true
+lang: en
 theme: custom-default
 paginate: true
 math: mathjax
@@ -106,7 +107,7 @@ Introduce the three responsibilities, then move to the live delivery path.
 
 <p class="cicd-subtitle">Parallel checks. A human gate. A progressive release.</p>
 
-<div class="cicd-board" data-pipeline aria-label="Interactive CI/CD pipeline">
+<div class="cicd-board" data-pipeline role="group" aria-label="Interactive CI/CD pipeline">
   <div class="cicd-board-heading"><span><b>release / 0142</b> <span class="cicd-muted">main &middot; example commit</span></span><span class="cicd-run-state" data-run-state>STATIC VIEW</span></div>
   <svg class="cicd-diagram" viewBox="0 0 1120 272" role="img" aria-labelledby="pipeline-title pipeline-desc">
     <title id="pipeline-title">From source commit to production</title>

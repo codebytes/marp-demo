@@ -1,5 +1,6 @@
 ---
 marp: true
+lang: en
 theme: custom-default
 paginate: true
 math: mathjax
