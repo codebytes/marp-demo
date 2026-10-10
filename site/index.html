@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A playground for Marp presentations. Explore an animated CI/CD deck with native SVG, interactive playback, and a printable PDF.">
+  <meta name="description" content="A playground for Marp presentations. Explore animated AI-agent context and CI/CD demos, native slide transitions, interactive playback, and readable PDFs.">
   <meta name="theme-color" content="#0b111b">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236ee7ca'/%3E%3Ctext x='10' y='43' font-family='monospace' font-size='36' fill='%230b111b'%3Em/%3C/text%3E%3C/svg%3E">
   <title>marp-demo | Markdown, meet motion</title>
@@ -35,6 +35,9 @@
     .collection-label { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; color: var(--muted); font: 12px/1.5 Consolas, monospace; letter-spacing: 1px; }
     .collection-label span:first-child { color: var(--foreground); }
     .demo { display: grid; grid-template-columns: 1.05fr 1fr; overflow: hidden; border: 1px solid #42576e; border-radius: 22px; background: var(--panel); box-shadow: 0 25px 65px #0003; }
+    .demo + .demo { margin-top: 26px; }
+    .context-demo { --mint: #c4afff; border-color: #655375; }
+    .context-demo .preview { background: radial-gradient(ellipse at 40% 35%, #39304c, transparent 70%), #161322; }
     .preview { display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 32px; background: radial-gradient(ellipse at 40% 35%, #1f393e, transparent 70%), #0e1926; border-right: 1px solid var(--border); }
     .preview-label { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 11px/1.5 Consolas, monospace; letter-spacing: 1px; }
     .preview-label span:first-child { color: var(--mint); }
@@ -89,11 +92,44 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">A PLAYGROUND FOR PRESENTATIONS</p>
         <h1 id="page-title">Markdown.<br><span>Meet motion.</span></h1>
-        <p class="intro-copy">Small files. Big possibilities. Experiments that push Marp beyond the slide, starting with a delivery platform you can put in motion.</p>
+        <p class="intro-copy">Small files. Big possibilities. Put a delivery platform in motion, watch an AI agent's context take shape, and explore what a presentation can do.</p>
       </section>
 
-      <div class="collection-label"><span>01 / THE FIRST EXPERIMENT</span><span>4 SLIDES &middot; HTML + PDF</span></div>
-      <article class="demo" aria-labelledby="demo-title">
+      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>2 DECKS &middot; HTML + PDF</span></div>
+      <article class="demo context-demo" data-deck="agent" aria-labelledby="agent-title">
+        <figure class="preview">
+          <div class="preview-label"><span>CONTEXT IN MOTION</span><span>DEMO / 02</span></div>
+          <svg viewBox="0 0 480 260" role="img" aria-labelledby="agent-preview-title agent-preview-desc">
+            <title id="agent-preview-title">Selected inputs build the context for an agent's next turn</title>
+            <desc id="agent-preview-desc">Instructions, a user prompt, a relevant skill, and tool definitions and evidence combine in a bounded context window before the next model turn.</desc>
+            <rect x="22" y="20" width="278" height="222" rx="17" fill="#1b192d" stroke="#82709d"/>
+            <path d="M22 58 H300" stroke="#423a59"/>
+            <g fill="#766982"><circle cx="39" cy="39" r="3"/><circle cx="50" cy="39" r="3"/><circle cx="61" cy="39" r="3"/></g>
+            <text x="279" y="43" text-anchor="end" fill="#b6aecb" font-family="Consolas, monospace" font-size="9">CONTEXT / THIS TURN</text>
+            <g fill="#252033" stroke="#504460"><rect x="39" y="73" width="243" height="31" rx="6"/><rect x="39" y="114" width="243" height="31" rx="6"/><rect x="39" y="155" width="243" height="31" rx="6"/><rect x="39" y="196" width="243" height="31" rx="6"/></g>
+            <g font-family="Segoe UI, Arial, sans-serif" font-size="13"><text x="53" y="94" fill="#c4afff">Instructions + conventions</text><text x="53" y="135" fill="#ffb29c">The user's prompt</text><text x="53" y="176" fill="#a0c8ff">The relevant skill</text><text x="53" y="217" fill="#72e7d1">Tool definitions + evidence</text></g>
+            <path d="M300 131 H359" fill="none" stroke="#c4afff" stroke-width="2"/>
+            <path d="m350 125 10 6-10 6" fill="none" stroke="#c4afff" stroke-width="2"/>
+            <circle cx="406" cy="131" r="42" fill="#292139" stroke="#c4afff" stroke-width="2"/>
+            <circle cx="406" cy="131" r="54" fill="none" stroke="#625172" stroke-dasharray="3 7"/>
+            <g fill="#f1eefb" font-family="Segoe UI, Arial, sans-serif" font-size="12" text-anchor="middle"><text x="406" y="128">NEXT</text><text x="406" y="145">TURN</text></g>
+          </svg>
+          <figcaption><strong>Not everything it knows.</strong> What this turn needs.</figcaption>
+        </figure>
+        <div class="demo-copy">
+          <p class="demo-kind">AI AGENTS / 6 SLIDES / NEW</p>
+          <h2 id="agent-title">From prompt<br>to action.</h2>
+          <p class="description">Watch instructions frame a request, skills load on demand, and tool results flow back into context. Explore two scenarios in a hands-on context lab.</p>
+          <ul class="tags" aria-label="Agent deck features"><li>Transitions + morphing</li><li>Context lab</li><li>Static PDF</li></ul>
+          <div class="links">
+            <a class="button primary" href="agent-context.html">Open presentation <span aria-hidden="true">&rarr;</span></a>
+            <a class="button" href="Agent-Context.pdf" download>Download PDF</a>
+          </div>
+          <a class="jump" href="agent-context.html#5">Jump to the context lab <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
+      <article class="demo" data-deck="cicd" aria-labelledby="demo-title">
         <figure class="preview">
           <div class="preview-label"><span>DELIVERY SYSTEM</span><span>DEMO / 0142</span></div>
           <svg viewBox="0 0 480 260" role="img" aria-labelledby="preview-title preview-desc">
@@ -129,7 +165,7 @@
           <figcaption><strong>One artifact.</strong> A visible path to production.</figcaption>
         </figure>
         <div class="demo-copy">
-          <p class="demo-kind">INTERACTIVE / PLATFORM ENGINEERING</p>
+          <p class="demo-kind">PLATFORM ENGINEERING / 4 SLIDES</p>
           <h2 id="demo-title">From commit<br>to confidence.</h2>
           <p class="description">Follow a change through parallel checks, a human approval gate, and a progressive rollout. Pause the story, step through it, or see what happens when tests fail.</p>
           <ul class="tags" aria-label="Demo features"><li>Native SVG</li><li>Local JavaScript</li><li>Playback controls</li></ul>
@@ -141,10 +177,10 @@
         </div>
       </article>
 
-      <section class="details" aria-label="Inside the experiment">
-        <div><span class="detail-number">01 / FOLLOW</span><h3>See the system work.</h3><p>Moving signals connect each stage. Tests and security run in parallel; approval unlocks production.</p></div>
-        <div><span class="detail-number">02 / TAKE CONTROL</span><h3>Change the conversation.</h3><p>Pause, resume, replay, step, change speed, or choose a failing run. The demo waits for your release decision.</p></div>
-        <div><span class="detail-number">03 / MAKE IT YOURS</span><h3>Open the three layers.</h3><p>Markdown tells the story. CSS sets the scene. Browser-native JavaScript drives the timeline. No animation library.</p></div>
+      <section class="details" aria-label="Inside the experiments">
+        <div><span class="detail-number">01 / FOLLOW</span><h3>Motion with a purpose.</h3><p>Follow the artifact or the context. Animated relationships and native Marp transitions make the ideas visible.</p></div>
+        <div><span class="detail-number">02 / TAKE CONTROL</span><h3>Present at your pace.</h3><p>Run, pause, replay, step, or switch scenarios. The interactive demos give you room to explain each stage.</p></div>
+        <div><span class="detail-number">03 / TAKE IT WITH YOU</span><h3>A readable static story.</h3><p>HTML brings the motion. PDFs keep complete diagrams and intentional snapshots, not unfinished animation frames.</p></div>
       </section>
       <p class="format-note"><strong>HTML is the interactive version.</strong> The PDF keeps a readable, static diagram. Reduced-motion preferences are respected; use Step to explore at your own pace.</p>
     </main>

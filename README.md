@@ -3,15 +3,44 @@
 A playground for presentations built with [Marp](https://marp.app/): Markdown,
 native SVG, and small, local JavaScript experiments.
 
-**[Explore the site](https://chris-ayers.com/marp-demo/)** |
-**[Open the presentation](https://chris-ayers.com/marp-demo/animated.html)** |
-**[Download the PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf)**
+**[Explore the site](https://chris-ayers.com/marp-demo/)**
 
-## The first demo
+| Demo | Browser presentation | Static export |
+| --- | --- | --- |
+| **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
+| **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
 
-**From commit to confidence** is the only deck in this repository. Its four slides
-introduce a delivery platform, explain the contract, run an interactive CI/CD
-simulation, and show how to customize it.
+## From prompt to action
+
+An animation-first tour of the inputs to an agent's next turn: instructions,
+the user's prompt, progressively loaded skills, tool definitions, and returned
+evidence. Native Marp **fade, cover, reveal, slide, and glow** transitions connect
+the ideas. A named context window **morphs** between the opening slides; layered
+cards, skill reveals, and animated request/result paths explain the relationships.
+
+The [context lab on slide 5](https://chris-ayers.com/marp-demo/agent-context.html#5)
+has two fictional scenarios: **Build a feature** and **Debug a failure**. Use
+**Run / Pause / Resume**, **Step**, **Replay**, and **1x / 2x** speed to follow
+the sequence. Definitions become available before a call; evidence appears only
+after its result. The lab starts manually, even without reduced-motion enabled.
+
+No real model or tool is invoked. This is an educational orchestration diagram,
+not private reasoning or a trace of a particular product. Its last step means
+"inputs ready for the next turn," not "coding task completed." Skill loading and
+tool flow are grounded in the
+[Agent Skills specification](https://agentskills.io/specification) and
+[MCP tools specification](https://modelcontextprotocol.io/specification/2025-11-25/server/tools);
+source links and caveats are retained in the speaker notes.
+
+The PDF is intentionally static: all cards and diagrams are complete, the lab
+shows a labeled feature-task snapshot, and the final slide keeps both the noisy
+and curated context compositions. Printing during a different running scenario
+still uses this authored snapshot, not a half-finished animation frame.
+
+## From commit to confidence
+
+Four slides introduce a delivery platform, explain the contract, run an interactive
+CI/CD simulation, and show how to customize it.
 
 On [slide 3](https://chris-ayers.com/marp-demo/animated.html#3), a commit flows through
 a build, parallel tests and security checks, artifact publication, staging, a
@@ -26,14 +55,24 @@ manual approval gate, and progressive production rollout.
 | Scenario | Choose a healthy run or failed tests that block downstream work. |
 | Speed | Switch between 1x and 2x. |
 
-The HTML starts playback when the simulation slide becomes active. Reduced-motion
-users start manually; Step works without moving particles. Playback is suspended
-while the slide or browser tab is hidden. Operate the controls in the **audience
-window**: presenter previews remain static, and playback state is not synchronized
-between windows. Use the arrow keys to navigate the four slides.
+The CI/CD simulation starts playback when its slide becomes active. Reduced-motion
+users start manually; Step works without moving particles.
 
 The PDF, print view, and JavaScript-disabled view retain the readable static SVG.
 This is a simulation, not a connection to real CI/CD infrastructure.
+
+## Presenting either deck
+
+Use the arrow keys to navigate. Operate interactive controls in the **audience
+window**: presenter and next-slide previews remain static, and playback state is
+not synchronized between windows. Running playback is suspended while a slide
+or the browser tab is hidden. Reduced-motion preferences disable the custom
+motion; Marp reduces slide transitions to a fade.
+
+Slide transitions use the browser's View Transition API. Unsupported browsers
+still navigate normally. Morphing is best viewed in current Chrome or Edge;
+[Marp documents Safari limitations](https://github.com/marp-team/marp-cli/blob/v4.5.1/docs/bespoke-transitions/README.md#morphing-animations).
+All content remains understandable without animation or JavaScript.
 
 ## Build and preview locally
 
@@ -65,27 +104,31 @@ The build replaces the generated `build` directory and exports exactly:
 ```text
 build/
   index.html
+  agent-context.html
+  Agent-Context.pdf
   animated.html
   Animated-CICD.pdf
+  assets/agent-context.js
   assets/animated-cicd.js
+  themes/agent-context.css
   themes/custom-default.css
   themes/animated-cicd.css
   .nojekyll
 ```
 
-Keep this directory together when hosting or sharing the HTML: its runtime uses
-the relative `assets/animated-cicd.js` path. No external fonts, icon CDN, or
+Keep this directory together when hosting or sharing the HTML: each runtime uses
+its relative `assets/` path. No external fonts, icon CDN, or
 animation library are required. Generated exports and dependencies are ignored
 by Git.
 
 Build only trusted Markdown and assets: HTML and local-file access are enabled
-for this demo. Marp's current build-tool dependency tree has upstream `npm audit`
+for these demos. Marp's current build-tool dependency tree has upstream `npm audit`
 advisories, including archive-extraction issues. Compatible fixes are captured
 in the lockfile; `npm audit fix --force` currently proposes an obsolete Marp
 release, so it is not a safe upgrade path. These Node.js dependencies are not
 deployed with the static site.
 
-## Check the demo
+## Check the demos
 
 After building, run:
 
@@ -93,20 +136,24 @@ After building, run:
 npm test
 ```
 
-The eight animation checks cover slide/SVG overflow, parallel stages, the approval
+The CI/CD checks cover slide/SVG overflow, parallel stages, the approval
 gate, timed playback and speed, failed tests, replay, particles, pause/resume,
 hidden slides/tabs, reduced motion, keyboard controls, and print/presenter/no-JS
-fallbacks. Site checks exercise the packaged HTML/PDF/assets and a responsive
-single-deck landing page under `/marp-demo/`.
+fallbacks. Agent-context checks exercise native transitions and morphing, card
+visibility, definitions-before-results, both scenarios, playback, keyboard
+controls, visibility/reduced-motion behavior, and deterministic static fallbacks.
+Site checks exercise both packaged HTML/PDF exports and the responsive landing
+page under `/marp-demo/`.
 
-`ANIMATED_DECK_HTML` can target another local HTML export. To run the same browser
-checks against a deployed site, use these PowerShell commands:
+`ANIMATED_DECK_HTML` and `AGENT_DECK_HTML` can target other local HTML exports.
+To run the same browser checks against a deployed site:
 
 ```powershell
 $env:SITE_URL = "https://chris-ayers.com/marp-demo/"
 $env:ANIMATED_DECK_URL = "$($env:SITE_URL)animated.html"
+$env:AGENT_DECK_URL = "$($env:SITE_URL)agent-context.html"
 npm test
-Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL
+Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL
 ```
 
 `SITE_URL` must end with `/`. Only the local preview-server checks are skipped
@@ -116,16 +163,20 @@ when testing a deployment.
 
 | File | Purpose |
 | --- | --- |
+| [slides/Agent-Context.md](slides/Agent-Context.md) | Agent-context story, accessible visuals, transitions, notes, and static snapshots. |
+| [slides/assets/agent-context.js](slides/assets/agent-context.js) | Context-lab scenarios, sequencing, and playback. |
+| [slides/themes/agent-context.css](slides/themes/agent-context.css) | Scoped visual compositions, morph naming, motion, and print styles. |
 | [slides/Animated-CICD.md](slides/Animated-CICD.md) | Narrative, accessible SVG, and speaker notes. |
 | [slides/assets/animated-cicd.js](slides/assets/animated-cicd.js) | Stages, timing, and interaction. |
 | [slides/themes/animated-cicd.css](slides/themes/animated-cicd.css) | Scoped styling, motion, and print fallback. |
 | [slides/themes/custom-default.css](slides/themes/custom-default.css) | Composes Marp's default theme with the demo theme. |
-| [site/index.html](site/index.html) | The single-deck showcase page. |
+| [site/index.html](site/index.html) | The two-deck showcase page. |
 
 Keep the `default` and `animated-cicd` imports in `custom-default.css`, and pass
 the whole theme directory to Marp. Inline theme imports in Markdown are not a
-replacement for this composition. The HTML export uses `--bespoke.osc=false`
-so Marp's on-screen toolbar does not cover the simulation controls.
+replacement for this composition. The agent-context theme imports Marp's
+`default` directly and does not change the CI/CD theme. Both HTML exports use
+`--bespoke.osc=false` so Marp's on-screen toolbar does not cover the controls.
 
 ## Publish
 
@@ -142,8 +193,8 @@ be added later; no starter or placeholder decks are shipped.
 ## Attribution
 
 MIT licensed, retaining **Copyright (c) 2023 Chris Ayers**. See [LICENSE](LICENSE).
-The original demo comes from
+The original CI/CD demo comes from
 [codebytes/marp-slides-template](https://github.com/codebytes/marp-slides-template).
 Visual inspiration: [Awesome-Marp](https://github.com/favourhong/Awesome-Marp)
 (typographic hierarchy, section labels, and card layouts). The SVG and animation
-code are original; slide transitions use Marp's built-in fade.
+code are original; slide transitions and morphing use Marp's native support.

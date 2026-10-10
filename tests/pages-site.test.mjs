@@ -7,15 +7,19 @@ import { createPreviewServer } from "../scripts/preview.mjs";
 let server;
 let browser;
 let siteUrl;
+const decks = [
+  { id: "cicd", html: "animated.html", pdf: "Animated-CICD.pdf", slides: "section.cicd", count: 4, root: "[data-pipeline]", script: "animated-cicd.js" },
+  { id: "agent", html: "agent-context.html", pdf: "Agent-Context.pdf", slides: "section.ctx", count: 6, root: "[data-context-lab]", script: "agent-context.js" },
+];
 
 before(async () => {
   if (process.env.SITE_URL) {
     siteUrl = new URL(process.env.SITE_URL).href;
     assert.ok(siteUrl.endsWith("/"), "SITE_URL must end with a slash.");
   } else {
-    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")), ["Animated-CICD.md"]);
+    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md"]);
     assert.deepEqual(readdirSync("build").filter((name) => /\.(html|pdf)$/.test(name)).sort(),
-      ["Animated-CICD.pdf", "animated.html", "index.html"]);
+      ["Agent-Context.pdf", "Animated-CICD.pdf", "agent-context.html", "animated.html", "index.html"]);
     server = createPreviewServer();
     await new Promise((resolve, reject) => {
       server.once("error", reject);
@@ -55,31 +59,38 @@ async function openSite(t, options = {}) {
   return page;
 }
 
-test("the single-deck landing page fits desktop and mobile without JavaScript", async (t) => {
+test("the two-deck landing page fits desktop and mobile without JavaScript", async (t) => {
   const page = await openSite(t, { javaScriptEnabled: false });
   assert.match(await page.title(), /marp-demo/);
-  assert.equal(await page.locator("article.demo").count(), 1);
+  assert.equal(await page.locator("article.demo").count(), 2);
   assert.equal(await page.locator("h1").count(), 1);
   assert.match(await page.locator("#demo-title").innerText(), /From commit\s+to confidence/);
+  assert.match(await page.locator("#agent-title").innerText(), /From prompt\s+to action/);
   for (const width of [1440, 768, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert.ok(overflow <= 1, `Landing page overflows by ${overflow}px at ${width}px.`);
-    assert.equal(await page.getByRole("link", { name: "Open presentation" }).isVisible(), true);
-    assert.equal(await page.getByRole("link", { name: "Download PDF" }).isVisible(), true);
+    for (const deck of decks) {
+      const card = page.locator(`[data-deck="${deck.id}"]`);
+      assert.equal(await card.getByRole("link", { name: "Open presentation" }).isVisible(), true);
+      assert.equal(await card.getByRole("link", { name: "Download PDF" }).isVisible(), true);
+    }
   }
 });
 
-test("relative presentation links load all four slides and the local runtime under the project prefix", async (t) => {
+test("both presentation links load their slides and local runtime under the project prefix", async (t) => {
   const page = await openSite(t);
-  await page.getByRole("link", { name: "Open presentation" }).click();
-  const loaded = new URL(page.url());
-  loaded.hash = "";
-  assert.equal(loaded.href, new URL("animated.html", siteUrl).href);
-  await page.waitForFunction(() => document.querySelector("[data-pipeline]")?.dataset.enhanced === "true");
-  assert.equal(await page.locator("section.cicd").count(), 4);
-  const script = await page.locator('script[src$="assets/animated-cicd.js"]').getAttribute("src");
-  assert.equal(new URL(script, page.url()).href, new URL("assets/animated-cicd.js", siteUrl).href);
+  for (const deck of decks) {
+    await page.goto(siteUrl);
+    await page.locator(`[data-deck="${deck.id}"]`).getByRole("link", { name: "Open presentation" }).click();
+    const loaded = new URL(page.url());
+    loaded.hash = "";
+    assert.equal(loaded.href, new URL(deck.html, siteUrl).href);
+    await page.waitForFunction((root) => document.querySelector(root)?.dataset.enhanced === "true", deck.root);
+    assert.equal(await page.locator(deck.slides).count(), deck.count);
+    const script = await page.locator(`script[src$="assets/${deck.script}"]`).getAttribute("src");
+    assert.equal(new URL(script, page.url()).href, new URL(`assets/${deck.script}`, siteUrl).href);
+  }
 });
 
 test("the packaged simulation can step through approval and release", async (t) => {
@@ -96,21 +107,37 @@ test("the packaged simulation can step through approval and release", async (t) 
   assert.equal(await page.locator("[data-pipeline]").getAttribute("data-state"), "complete");
 });
 
-test("the PDF, runtime, and composed themes are included in the published package", async (t) => {
+test("both PDFs, runtimes, and themes are included in the published package", async (t) => {
   const page = await openSite(t);
-  const href = await page.getByRole("link", { name: "Download PDF" }).getAttribute("href");
-  assert.equal(new URL(href, siteUrl).href, new URL("Animated-CICD.pdf", siteUrl).href);
-  const pdf = await page.request.get(new URL(href, siteUrl).href);
-  assert.equal(pdf.status(), 200);
-  assert.match(pdf.headers()["content-type"], /application\/pdf/);
-  const bytes = await pdf.body();
-  assert.equal(bytes.subarray(0, 5).toString(), "%PDF-");
-  assert.ok(bytes.length > 10_000, "The PDF must contain the rendered deck.");
-  for (const path of ["assets/animated-cicd.js", "themes/custom-default.css", "themes/animated-cicd.css"]) {
+  for (const deck of decks) {
+    const href = await page.locator(`[data-deck="${deck.id}"]`).getByRole("link", { name: "Download PDF" }).getAttribute("href");
+    assert.equal(new URL(href, siteUrl).href, new URL(deck.pdf, siteUrl).href);
+    const pdf = await page.request.get(new URL(href, siteUrl).href);
+    assert.equal(pdf.status(), 200);
+    assert.match(pdf.headers()["content-type"], /application\/pdf/);
+    const bytes = await pdf.body();
+    assert.equal(bytes.subarray(0, 5).toString(), "%PDF-");
+    assert.ok(bytes.length > 10_000, "The PDF must contain the rendered deck.");
+  }
+  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css"]) {
     const asset = await page.request.get(new URL(path, siteUrl).href);
     assert.equal(asset.status(), 200, path);
     assert.ok((await asset.body()).length > 100, `${path} must not be empty.`);
   }
+});
+
+test("the project-prefix link opens the context lab and preserves its tool-result sequence", async (t) => {
+  const page = await openSite(t);
+  await page.getByRole("link", { name: "Jump to the context lab" }).click();
+  await page.waitForFunction(() => document.querySelector("[data-context-lab]")?.dataset.enhanced === "true");
+  await page.waitForFunction(() => document.querySelector('section[id="5"]').closest("svg").classList.contains("bespoke-marp-active"));
+  await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
+  for (let step = 0; step < 3; step += 1) await page.locator('[data-context-action="step"]').click();
+  assert.equal(await page.locator('[data-context-item="evidence"]').getAttribute("data-present"), "false");
+  await page.locator('[data-context-action="step"]').click();
+  assert.equal(await page.locator('[data-context-item="evidence"]').getAttribute("data-present"), "true");
+  await page.locator('[data-context-action="step"]').click();
+  assert.equal(await page.locator("[data-context-lab]").getAttribute("data-state"), "complete");
 });
 
 test("preview redirects to the project path and never serves source files", { skip: Boolean(process.env.SITE_URL) }, async (t) => {

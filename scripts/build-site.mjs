@@ -21,25 +21,30 @@ for (const directory of ["assets", "themes"]) {
   cpSync(join(root, "slides", directory), join(output, directory), { recursive: true });
 }
 
-for (const [filename, options] of [
-  ["animated.html", ["--bespoke.osc=false"]],
-  ["Animated-CICD.pdf", ["--pdf", "--allow-local-files"]],
+for (const [source, html] of [
+  ["Animated-CICD", "animated.html"],
+  ["Agent-Context", "agent-context.html"],
 ]) {
-  const result = spawnSync(process.execPath, [
-    marp, "--no-stdin", "--html",
-    "--theme-set", join(root, "slides", "themes"),
-    ...options,
-    "-o", join(output, filename),
-    "--", join(root, "slides", "Animated-CICD.md"),
-  ], {
-    cwd: root,
-    stdio: "inherit",
-    env: { ...process.env, CHROME_PATH: browser },
-  });
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(`Marp failed to export ${filename} (exit ${result.status}, signal ${result.signal}).`);
+  for (const [filename, options] of [
+    [html, ["--bespoke.osc=false"]],
+    [`${source}.pdf`, ["--pdf", "--allow-local-files"]],
+  ]) {
+    const result = spawnSync(process.execPath, [
+      marp, "--no-stdin", "--html",
+      "--theme-set", join(root, "slides", "themes"),
+      ...options,
+      "-o", join(output, filename),
+      "--", join(root, "slides", `${source}.md`),
+    ], {
+      cwd: root,
+      stdio: "inherit",
+      env: { ...process.env, CHROME_PATH: browser },
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      throw new Error(`Marp failed to export ${filename} (exit ${result.status}, signal ${result.signal}).`);
+    }
   }
 }
 
-console.log("Built one presentation (HTML + PDF) and its local assets in build.");
+console.log("Built both presentations (HTML + PDF) and their local assets in build.");
