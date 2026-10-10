@@ -84,8 +84,9 @@ animation-delay: 1s;</code></pre>
 The three HTML node cards share the ml-lift CSS keyframes, delayed by 0, 1, and
 2 seconds. Each gesture lasts 2 seconds, so the whole sequence ends at 4 seconds.
 Only transform and box-shadow change; labels and the connecting path stay visible.
-The JavaScript toggles CSS playback classes. CSS, not JavaScript, interpolates the
-frames. Pause sets animation-play-state; Replay removes and restarts the keyframes.
+The JavaScript toggles playback classes and holds native CSSAnimation clocks.
+CSS, not JavaScript, interpolates the frames. Pause holds the CSS clock
+immediately, even when Marp hides its SVG before the next paint. Replay restarts it.
 Source: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations
 -->
 

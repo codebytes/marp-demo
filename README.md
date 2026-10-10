@@ -41,11 +41,13 @@ cross-fades: this is element-geometry morphing, **not SVG path interpolation**.
 
 CSS and native SVG perform the early examples' interpolation. Sprites and video
 are pre-rendered pixels; Lottie uses its **JavaScript vector renderer**. The shared
-script manages playback classes, separate SVG/media/player clocks, completion
+script manages native CSS playback controls, separate SVG/media/player clocks, completion
 events, and visibility rather than recreating all effects in an animation loop.
 That is **not** a claim of zero JavaScript: Marp and playback controls also use it.
 CSS `animation-play-state` cannot pause SMIL, so the SVG example explicitly uses
 `pauseAnimations()` and `unpauseAnimations()`.
+For CSS, Pause also holds the native animation's current time synchronously;
+a hidden Marp SVG can otherwise defer a style-only pause until another paint.
 
 Reduced motion, print, no-JavaScript, and presenter views keep complete static
 diagrams and hide playback controls. Printing mid-animation restores the authored

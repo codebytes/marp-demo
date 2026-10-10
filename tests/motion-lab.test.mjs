@@ -245,11 +245,17 @@ for (const [index, technique] of techniques.entries()) {
     await toggle.click();
     await blurAndNavigate(page, "ArrowRight", slide + 1);
     await waitForState(root, "paused");
+    const clocks = () => root.evaluate((element) => element.getAnimations({ subtree: true })
+      .map((animation) => ({ time: animation.currentTime, state: animation.playState, pending: animation.pending })));
+    const stoppedClocks = await clocks();
+    assert.ok(stoppedClocks.every((clock) => clock.state === "paused" && !clock.pending),
+      "Hidden CSS clocks must be held immediately, not waiting for another paint.");
     await readMotion(root);
     await page.waitForTimeout(150);
     const suspended = await readMotion(root);
     await page.waitForTimeout(250);
     assert.deepEqual(await readMotion(root), suspended, "Leaving a slide must suspend its clock.");
+    assert.deepEqual(await clocks(), stoppedClocks, "Hidden native CSS timeline values must not advance.");
     await blurAndNavigate(page, "ArrowLeft", slide);
     assert.equal(await root.getAttribute("data-motion-state"), "paused");
 
@@ -275,6 +281,25 @@ for (const [index, technique] of techniques.entries()) {
     if (technique === "vector") assert.equal(await page.evaluate(() => window.lottie.getRegisteredAnimations()[0].isPaused), true);
   });
 }
+
+test("resuming late choreography never replays a node whose gesture already finished", async (t) => {
+  const page = await openDeck(t, { slide: 2 });
+  const root = page.locator('[data-motion-technique="css"]');
+  const toggle = root.locator('[data-motion-action="toggle"]');
+  await toggle.click();
+  await root.evaluate((element) => {
+    for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = 2400;
+    element.querySelector('[data-motion-action="toggle"]').click();
+  });
+  await waitForState(root, "paused");
+  const firstNode = root.locator(".ml-node-a");
+  const finished = await firstNode.evaluate((node) => getComputedStyle(node).transform);
+  await toggle.click();
+  await page.waitForTimeout(300);
+  assert.equal(await firstNode.evaluate((node) => getComputedStyle(node).transform), finished);
+  assert.ok(await firstNode.evaluate((node) => node.getAnimations()[0].currentTime >= 2000));
+  await waitForState(root, "complete");
+});
 
 test("the sprite uses discrete cells rather than interpolating a background slide", async (t) => {
   const page = await openDeck(t, { slide: 7 });

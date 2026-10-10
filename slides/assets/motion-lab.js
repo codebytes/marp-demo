@@ -124,11 +124,16 @@
 
       function pause() {
         if (state !== "running") return;
+        const clocks = root.getAnimations({ subtree: true })
+          .map((animation) => ({ animation, time: animation.currentTime ?? 0 }));
         state = "paused";
         if (svg) svg.pauseAnimations();
         if (video) video.pause();
         if (player) player.pause();
         render();
+        // Resolve the style's pending pause now; a hidden SVG can defer its next paint.
+        root.getAnimations({ subtree: true });
+        for (const { animation, time } of clocks) animation.currentTime = time;
       }
 
       toggle.addEventListener("click", () => state === "running" ? pause() : play());
