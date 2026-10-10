@@ -5,6 +5,10 @@
   const printMedia = window.matchMedia("print");
   const morphNames = ["stage", "kicker", "title", "dek", "step-1", "step-2", "step-3", "stat", "note"].map((name) => `sl-live-${name}`);
   const deckKeys = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"]);
+  // Marp scales slides for WebKit with a polyfill, keyed on this same check, and WebKit then reports the
+  // wrong box for everything inside a slide (https://bugs.webkit.org/show_bug.cgi?id=23113). A View
+  // Transition built on those boxes throws parts out of the frame, so WebKit cross-fades in place instead.
+  const misplacedBoxes = navigator.vendor === "Apple Computer, Inc.";
 
   function transitionActive() {
     try {
@@ -28,7 +32,9 @@
     const groups = morphNames.map((name) => `::view-transition-group(${name})`).join(", ");
     const images = morphNames.map((name) => `::view-transition-old(${name}), ::view-transition-new(${name})`).join(", ");
     // Cross-fade quickly, then let the shared boxes glide, so the in-between frames stay crisp.
-    style.textContent = `${groups} { animation-duration: 720ms; animation-timing-function: cubic-bezier(.45, 0, .2, 1); } ${images} { animation-duration: 300ms; animation-timing-function: ease-out; }`;
+    // Each snapshot fits inside its moving box: a part that changes shape, such as a footer bar
+    // becoming a sticky note, would otherwise scale by width alone and spill out of the frame.
+    style.textContent = `${groups} { animation-duration: 720ms; animation-timing-function: cubic-bezier(.45, 0, .2, 1); } ${images} { height: 100%; object-fit: contain; animation-duration: 300ms; animation-timing-function: ease-out; }`;
     document.head.append(style);
   }
 
@@ -62,11 +68,31 @@
       restage(style);
     }
 
+    // Fades a copy of the old stage out over the restyled one, so nothing moves outside the frame.
+    let fading = null;
+    function crossFade(style) {
+      fading?.remove();
+      const copy = stage.cloneNode(true);
+      copy.removeAttribute("data-live-stage");
+      copy.setAttribute("aria-hidden", "true");
+      copy.inert = true;
+      stage.after(copy);
+      fading = copy;
+      apply(style);
+      copy.animate({ opacity: [1, 0] }, { duration: 450, easing: "ease-out" }).finished.catch(() => {}).finally(() => {
+        copy.remove();
+        if (fading === copy) fading = null;
+      });
+    }
+
     function choose(style) {
       if (!enhanced || style === current) return;
-      const canMorph = typeof document.startViewTransition === "function" && !reducedMotion.matches && !transitionActive();
-      if (!canMorph) {
+      if (reducedMotion.matches || transitionActive()) {
         apply(style);
+        return;
+      }
+      if (misplacedBoxes || typeof document.startViewTransition !== "function") {
+        crossFade(style);
         return;
       }
       // Update the controls before the old snapshot, so only the stage morphs.
@@ -97,6 +123,7 @@
     return {
       update(audience) {
         const nextEnhanced = audience && !printMedia.matches;
+        if (!nextEnhanced) fading?.remove();
         if (!nextEnhanced && current !== authored) apply(authored);
         enhanced = nextEnhanced;
         root.dataset.enhanced = String(enhanced);

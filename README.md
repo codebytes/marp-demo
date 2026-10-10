@@ -50,7 +50,9 @@ On [slide 11](https://chris-ayers.com/marp-demo/style-lab.html#11), eight
 buttons restyle the same specimen live. The runtime swaps the stage class inside
 `document.startViewTransition()`, and temporary `view-transition-name` values let
 each element move from its old box to its new one while the rendering
-cross-fades. The names exist only during a switch, so Marp's slide transitions
+cross-fades. Each snapshot fits inside its moving box, so a part that changes
+shape, such as the brutalist footer bar becoming a sticky note, stays inside the
+frame. The names exist only during a switch, so Marp's slide transitions
 are unaffected.
 
 [![The live restyle slide mid-morph from house style to Swiss poster: the headline, steps, and red stat circle are still moving into place beside eight style buttons](docs/screenshots/style-lab-live.webp)](https://chris-ayers.com/marp-demo/style-lab.html#11)
@@ -71,14 +73,19 @@ Type is part of each style, so the deck bundles **17 unmodified WOFF2 files from
 11 open font families** (about 0.5 MB) with their licenses. The HTML and PDF
 render the same fonts on any machine, including the Linux Pages runner, with no
 font CDN. Textures are CSS gradients, blend modes, and SVG data URIs; the deck
-contains no raster images. The PDF has all **thirteen pages** at about 1.7 MB:
+contains no raster images. The PDF has all **thirteen pages** in under 2 MB:
 it omits the film grain, which Chromium would rasterize on every page, and keeps
 the authored house style on the live slide.
 
 Reduced motion switches styles instantly and skips entrances. Print,
 presenter, and no-JavaScript views keep the authored house style and hide the
-buttons, which appear only in the audience window. The live morph is verified in
-Chromium; browsers without View Transitions still switch styles.
+buttons, which appear only in the audience window. Chrome and Edge morph the
+parts. Safari cross-fades the whole stage inside the frame instead: WebKit
+reports the wrong boxes for elements inside Marp's scaled slides
+([WebKit bug 23113](https://bugs.webkit.org/show_bug.cgi?id=23113), a limitation
+[Marp documents](https://github.com/marp-team/marp-cli/blob/v4.5.1/docs/bespoke-transitions/README.md#morphing-animations)
+for morphing), so a morph would throw parts out of the frame. Browsers without
+View Transitions cross-fade the same way.
 
 ## Motion Lab
 
@@ -412,7 +419,10 @@ including each gradient's brightest wash and the text on the risograph inks, whi
 must also stay clear of the overprints. They confirm that every entrance rule
 reaches a real part with its intended delay and ends exactly in the authored still.
 They also run the live morph from the mouse and keyboard, where arrow keys still
-change slides from a focused button. Reduced motion, transitions, print, presenter,
+change slides from a focused button, and confirm that no morphing part leaves the
+frame. With WebKit installed (`npx playwright install webkit`), a Safari check
+confirms that WebKit cross-fades instead of morphing; CI installs only Chromium,
+so it skips that check. Reduced motion, transitions, print, presenter,
 and no-JS fallbacks are covered, as are PDF pages and size and a license entry for
 every font file.
 README checks confirm every captured screenshot is shown, exists, and has alt text.
