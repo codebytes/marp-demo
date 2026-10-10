@@ -3,15 +3,17 @@
 A playground for presentations built with [Marp](https://marp.app/): Markdown,
 native SVG, and small, local JavaScript experiments.
 
+[![The marp-demo showcase page: "Markdown. Meet motion." above the Motion Lab card](docs/screenshots/showcase.webp)](https://chris-ayers.com/marp-demo/)
+
 **[Explore the site](https://chris-ayers.com/marp-demo/)**
 
-| Demo | Browser presentation | Static export |
-| --- | --- | --- |
-| **Motion Lab** - one diagram, nine animation techniques, twelve slides | [HTML](https://chris-ayers.com/marp-demo/motion-lab.html) | [PDF](https://chris-ayers.com/marp-demo/Motion-Lab.pdf) |
-| **Throttle the burst** - token-bucket admission, seven slide keyframes | [HTML](https://chris-ayers.com/marp-demo/throttling.html) | [PDF](https://chris-ayers.com/marp-demo/Throttling.pdf) |
-| **Await the work. Not the thread.** - .NET async/await, four slides | [HTML](https://chris-ayers.com/marp-demo/async-await.html) | [PDF](https://chris-ayers.com/marp-demo/Async-Await.pdf) |
-| **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
-| **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
+| Preview | Demo | Browser presentation | Static export |
+| --- | --- | --- | --- |
+| <a href="https://chris-ayers.com/marp-demo/motion-lab.html"><img src="docs/screenshots/motion-lab-cover.webp" width="240" alt="Motion Lab title slide: Same diagram. Different verbs."></a> | **Motion Lab** - one diagram, nine animation techniques, twelve slides | [HTML](https://chris-ayers.com/marp-demo/motion-lab.html) | [PDF](https://chris-ayers.com/marp-demo/Motion-Lab.pdf) |
+| <a href="https://chris-ayers.com/marp-demo/throttling.html"><img src="docs/screenshots/throttling-cover.webp" width="240" alt="Throttle the burst, frame 1: a full three-token bucket meets four arriving requests."></a> | **Throttle the burst** - token-bucket admission, seven slide keyframes | [HTML](https://chris-ayers.com/marp-demo/throttling.html) | [PDF](https://chris-ayers.com/marp-demo/Throttling.pdf) |
+| <a href="https://chris-ayers.com/marp-demo/async-await.html"><img src="docs/screenshots/async-await-cover.webp" width="240" alt="Await the work. Not the thread. title slide with a run, suspend, and resume timeline."></a> | **Await the work. Not the thread.** - .NET async/await, four slides | [HTML](https://chris-ayers.com/marp-demo/async-await.html) | [PDF](https://chris-ayers.com/marp-demo/Async-Await.pdf) |
+| <a href="https://chris-ayers.com/marp-demo/agent-context.html"><img src="docs/screenshots/agent-context-cover.webp" width="240" alt="From prompt to action title slide with instruction, skill, prompt, and tool-result cards."></a> | **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
+| <a href="https://chris-ayers.com/marp-demo/animated.html"><img src="docs/screenshots/animated-cicd-cover.webp" width="240" alt="From commit to confidence title slide with a commit, verify, and release path."></a> | **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
 
 ## Motion Lab
 
@@ -19,6 +21,10 @@ native SVG, and small, local JavaScript experiments.
 while eight in-slide experiments change how it moves. A two-slide morph then
 rearranges those same objects. This is a comparison of **animation techniques**,
 not another engineering simulation.
+
+[![Nine panels of the same A, B, C diagram: eight experiments paused mid-run, each moving it differently, and the morph's enlarged B](docs/screenshots/motion-lab-techniques.webp)](https://chris-ayers.com/marp-demo/motion-lab.html#2)
+
+*Eight experiments paused mid-run, plus the focus state the morph moves B into.*
 
 | Slides | Technique | What actually animates |
 | --- | --- | --- |
@@ -79,6 +85,13 @@ to advance or rewind. Requests and tokens retain the same `view-transition-name`
 across slides, so Marp animates changes to their position, size, and appearance.
 There is **no custom runtime, autoplay, or within-slide animation**.
 
+<p>
+  <a href="https://chris-ayers.com/marp-demo/throttling.html#1"><img src="docs/screenshots/throttling-frame-1.webp" width="49%" alt="Frame 1: a full bucket of three tokens meets four arriving requests, A through D."></a>
+  <a href="https://chris-ayers.com/marp-demo/throttling.html#4"><img src="docs/screenshots/throttling-frame-4.webp" width="49%" alt="Frame 4: A, B, and C are admitted, the bucket is empty, and D is rejected with 429 Too Many Requests."></a>
+</p>
+
+*Frames 1 and 4: the same named requests and tokens, rearranged one keyframe at a time.*
+
 The seven frames illustrate a token bucket with **capacity 3**, **one new token
 per second**, **one token per admission**, and **no waiting queue**:
 
@@ -110,6 +123,10 @@ the left** and a **conceptual compiler state machine on the right**. The
 [async lab on slide 3](https://chris-ayers.com/marp-demo/async-await.html#3) highlights
 the active C# line, CPU activity, the awaited `Task<string>`, the method's returned
 `Task<int>`, saved state, and the corresponding diagram node/edge from one snapshot.
+
+[![The async lab suspended at await: line 3 is highlighted, the CPU lane says no thread is held, both tasks are pending, and the Save + suspend node is active](docs/screenshots/async-await-lab.webp)](https://chris-ayers.com/marp-demo/async-await.html#3)
+
+*Stepped to the pending read: the method is suspended, and no thread waits for the I/O.*
 
 Use **Run / Pause / Resume**, **Step**, **Replay**, and **1x / 2x** speed. Compare:
 
@@ -146,6 +163,10 @@ has two fictional scenarios: **Build a feature** and **Debug a failure**. Use
 the sequence. Definitions become available before a call; evidence appears only
 after its result. The lab starts manually, even without reduced-motion enabled.
 
+[![The context lab at step 5 of 6: instructions, prompt, skill, tool definitions, and the tool result fill the context while the result returns from tool to model](docs/screenshots/agent-context-lab.webp)](https://chris-ayers.com/marp-demo/agent-context.html#5)
+
+*Step 5 of 6 in "Build a feature": the tool result joins the context as evidence.*
+
 No real model or tool is invoked. This is an educational orchestration diagram,
 not private reasoning or a trace of a particular product. Its last step means
 "inputs ready for the next turn," not "coding task completed." Skill loading and
@@ -167,6 +188,10 @@ CI/CD simulation, and show how to customize it.
 On [slide 3](https://chris-ayers.com/marp-demo/animated.html#3), a commit flows through
 a build, parallel tests and security checks, artifact publication, staging, a
 manual approval gate, and progressive production rollout.
+
+[![The CI/CD simulation awaiting approval: commit, build, tests, security, artifact, and staging passed, production is locked, and Approve release is highlighted](docs/screenshots/animated-cicd-lab.webp)](https://chris-ayers.com/marp-demo/animated.html#3)
+
+*Stepped to the approval gate: staging is healthy, and production waits for a person.*
 
 | Control | Behavior |
 | --- | --- |
@@ -307,6 +332,7 @@ Motion Lab checks measure actual changing transforms, dash offsets, masks, SVG
 signal geometry, discrete sprite frames, decoded video pixels, rendered Lottie
 vectors, and named transition geometry. They cover finite completion, replay/pause,
 hidden slides/tabs, keyboard controls, transitions, static fallbacks, and slide fit.
+README checks confirm every captured screenshot is shown, exists, and has alt text.
 
 `ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, `ASYNC_DECK_HTML`, and `THROTTLE_DECK_HTML`
 can target other local HTML exports. Motion Lab checks use the HTTP preview so
@@ -327,6 +353,24 @@ Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_D
 
 `SITE_URL` must end with `/`. Only the local preview-server checks are skipped
 when testing a deployment.
+
+## Refresh the README screenshots
+
+The images in [docs/screenshots](docs/screenshots) are captured from the built
+site. After `npm run build`, run:
+
+```sh
+npm run screenshots
+```
+
+The script serves `build` under `/marp-demo/`, opens each deck in Playwright's
+Chromium, and replaces `docs/screenshots` with WebP files only after every capture
+succeeds. Labs are advanced with **Step** under reduced motion, so each image shows
+a fixed state rather than a moment of timed playback. Motion Lab experiments are
+paused, then their clocks are moved to two seconds (3.2 seconds for the SVG signal,
+which B covers at two). The video plays to that frame instead, because the preview
+server does not support seeking. Fonts and video timing can differ slightly by host.
+The screenshots are tracked in Git but are not part of the published site.
 
 ## Edit the three layers
 
@@ -350,6 +394,7 @@ when testing a deployment.
 | [slides/themes/animated-cicd.css](slides/themes/animated-cicd.css) | Scoped styling, motion, and print fallback. |
 | [slides/themes/custom-default.css](slides/themes/custom-default.css) | Composes Marp's default theme with the demo theme. |
 | [site/index.html](site/index.html) | The five-deck showcase page. |
+| [scripts/capture-screenshots.mjs](scripts/capture-screenshots.mjs) | README screenshots: fixed lab states, paused Motion Lab clocks, and WebP output. |
 
 Keep the `default`, `animated-cicd`, and `motion-lab` imports in `custom-default.css`, and pass
 the whole theme directory to Marp. Inline theme imports in Markdown are not a
