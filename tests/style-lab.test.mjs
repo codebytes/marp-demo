@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { after, before, test } from "node:test";
 import { inflateSync } from "node:zlib";
-import { chromium } from "playwright";
+import { chromium, webkit } from "playwright";
 import { createPreviewServer } from "../scripts/preview.mjs";
 
 const styles = ["house", "riso", "swiss", "brutal", "sketch", "blueprint", "editorial", "beamer"];
@@ -37,7 +37,7 @@ async function waitForSlide(page, slide) {
   await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
 }
 
-async function openDeck(t, { slide = 1, motion = "reduce", javaScriptEnabled = true, view } = {}) {
+async function openDeck(t, { slide = 1, motion = "reduce", javaScriptEnabled = true, view, viewTransitions = true } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, reducedMotion: motion, javaScriptEnabled });
   t.after(() => context.close());
   const page = await context.newPage();
@@ -55,6 +55,7 @@ async function openDeck(t, { slide = 1, motion = "reduce", javaScriptEnabled = t
     assert.deepEqual(errors, [], "Style Lab must not emit browser or HTTP errors.");
     assert.deepEqual(external, [], "Fonts, textures, and scripts must all be local.");
   });
+  if (!viewTransitions) await page.addInitScript(() => { delete Document.prototype.startViewTransition; });
   await page.addInitScript(() => {
     window.styleMorphs = { started: 0, finished: 0, errors: [] };
     if (!document.startViewTransition) return;
@@ -373,6 +374,114 @@ test("the live restyle morphs one element tree and works from the keyboard", asy
   assert.equal(await reduced.locator("[data-live-stage]").getAttribute("data-style"), "beamer");
   assert.equal(await reduced.evaluate(() => window.styleMorphs.started), 0, "Reduced motion switches styles without a morph.");
 });
+
+test("the live restyle keeps every morphing part inside its frame", async (t) => {
+  const page = await openDeck(t, { slide: liveSlide, motion: "no-preference" });
+  await page.waitForFunction(() => document.querySelector("[data-style-lab]").dataset.enhanced === "true");
+  const frame = await page.locator(".sl-live-frame").boundingBox();
+  const choose = async (name) => {
+    const finished = await page.evaluate(() => window.styleMorphs.finished);
+    await page.getByRole("button", { name, exact: true }).click();
+    return finished;
+  };
+  // The biggest shape changes: a footer bar becomes a sticky note, a theorem block a card, a title block a numeral.
+  for (const [from, to] of [["Brutalist", "Sketch"], ["Beamer", "House"], ["Blueprint", "Broadsheet"]]) {
+    await page.waitForFunction((count) => window.styleMorphs.finished > count, await choose(from));
+    await choose(to);
+    await page.waitForFunction(() => document.getAnimations().some((animation) => animation.effect?.pseudoElement?.startsWith("::view-transition")));
+    const midway = [];
+    for (const time of [120, 300]) {
+      await page.evaluate((time) => {
+        for (const animation of document.getAnimations()) {
+          if (animation.effect?.pseudoElement?.startsWith("::view-transition")) {
+            animation.pause();
+            animation.currentTime = time;
+          }
+        }
+        return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }, time);
+      midway.push((await page.screenshot()).toString("base64"));
+    }
+    await page.evaluate(() => {
+      for (const animation of document.getAnimations()) if (animation.effect?.pseudoElement?.startsWith("::view-transition")) animation.finish();
+    });
+    await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
+    const settled = (await page.screenshot()).toString("base64");
+    const escaped = await page.evaluate(async ({ midway, settled, frame }) => {
+      const pixels = async (data) => {
+        const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${data}`)).blob());
+        const context = new OffscreenCanvas(bitmap.width, bitmap.height).getContext("2d");
+        context.drawImage(bitmap, 0, 0);
+        return context.getImageData(0, 0, bitmap.width, bitmap.height);
+      };
+      const after = await pixels(settled);
+      const inside = (x, y) => x >= frame.x - 2 && x < frame.x + frame.width + 2 && y >= frame.y - 2 && y < frame.y + frame.height + 2;
+      return Promise.all(midway.map(async (shot) => {
+        const during = await pixels(shot);
+        let changed = 0;
+        for (let y = 0; y < after.height; y += 1) {
+          for (let x = 0; x < after.width; x += 1) {
+            const index = (y * after.width + x) * 4;
+            if (!inside(x, y) && [0, 1, 2].some((channel) => Math.abs(during.data[index + channel] - after.data[index + channel]) > 32)) changed += 1;
+          }
+        }
+        return changed;
+      }));
+    }, { midway, settled, frame });
+    assert.deepEqual(escaped, [0, 0], `${from} → ${to}: pixels changed outside the frame while the parts morphed.`);
+  }
+});
+
+test("without View Transitions, the live restyle cross-fades inside its frame", async (t) => {
+  const page = await openDeck(t, { slide: liveSlide, motion: "no-preference", viewTransitions: false });
+  await page.waitForFunction(() => document.querySelector("[data-style-lab]").dataset.enhanced === "true");
+  await page.getByRole("button", { name: "Riso", exact: true }).click();
+  const stages = await page.evaluate(() => [...document.querySelectorAll(".sl-live-frame > .sl-stage")].map((stage) => ({
+    style: stage.dataset.style, live: stage.hasAttribute("data-live-stage"), hidden: stage.getAttribute("aria-hidden"), inert: stage.inert,
+  })));
+  assert.deepEqual(stages, [
+    { style: "riso", live: true, hidden: null, inert: false },
+    { style: "house", live: false, hidden: "true", inert: true },
+  ], "A hidden, inert copy of the old stage fades out over the restyled one.");
+  await page.waitForFunction(() => document.querySelectorAll(".sl-live-frame > .sl-stage").length === 1);
+  assert.equal(await page.evaluate(() => window.styleMorphs.started), 0);
+  assert.match(await page.locator("[data-style-status]").innerText(), /^Risograph zine/);
+});
+
+test("Safari's WebKit cross-fades the live restyle instead of morphing misplaced boxes",
+  { skip: existsSync(webkit.executablePath()) ? false : "WebKit is not installed; run npx playwright install webkit" }, async () => {
+    const safari = await webkit.launch();
+    try {
+      const page = await safari.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: "no-preference" });
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      await page.addInitScript(() => {
+        window.morphs = 0;
+        const start = Document.prototype.startViewTransition;
+        if (start) Document.prototype.startViewTransition = function (...args) {
+          window.morphs += 1;
+          return start.apply(this, args);
+        };
+      });
+      const url = new URL(deckUrl);
+      url.hash = String(liveSlide);
+      await page.goto(url.href);
+      await page.waitForFunction(() => document.querySelector("[data-style-lab]")?.dataset.enhanced === "true");
+      assert.equal(await page.evaluate(() => navigator.vendor), "Apple Computer, Inc.");
+      // WebKit misreports button boxes inside Marp's slides, so the button is pressed from script.
+      const stages = await page.evaluate(() => {
+        document.querySelector('[data-style-choice="riso"]').click();
+        return document.querySelectorAll(".sl-live-frame > .sl-stage").length;
+      });
+      assert.equal(stages, 2, "WebKit fades a copy of the old stage out inside the frame.");
+      await page.waitForFunction(() => document.querySelectorAll(".sl-live-frame > .sl-stage").length === 1);
+      assert.equal(await page.locator("[data-live-stage]").getAttribute("data-style"), "riso");
+      assert.equal(await page.evaluate(() => window.morphs), 0, "WebKit must not start a View Transition for the restyle.");
+      assert.deepEqual(errors, []);
+    } finally {
+      await safari.close();
+    }
+  });
 
 test("print, presenter, and no-JS views keep the authored house style without controls", async (t) => {
   const page = await openDeck(t, { slide: liveSlide });

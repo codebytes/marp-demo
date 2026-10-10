@@ -336,8 +336,11 @@ move each element from its old box to its new one while cross-fading the
 rendering. The names exist only during a switch, so Marp's slide transitions
 are unaffected. Reduced motion switches instantly. Print, presenter, and no-JS
 views keep the authored house style, and the buttons appear only in the audience
-window. Verified in Chromium; browsers without View Transitions still switch.
-Source: https://developer.mozilla.org/docs/Web/API/View_Transition_API
+window. Chrome and Edge morph the parts. Safari cross-fades the stage instead,
+because WebKit misplaces elements inside Marp's scaled slides; browsers without
+View Transitions cross-fade too.
+Sources: https://developer.mozilla.org/docs/Web/API/View_Transition_API and
+https://bugs.webkit.org/show_bug.cgi?id=23113
 -->
 
 ---
