@@ -99,6 +99,12 @@ not synchronized between windows. Running playback is suspended while a slide
 or the browser tab is hidden. Reduced-motion preferences disable the custom
 motion; Marp reduces slide transitions to a fade.
 
+Decorative cover signals, floating context cards, the selected-skill glow, and
+the tool call/result flow loop while their slide is active and visible. Text/card
+entrances still play once per entry, and interactive simulations do not restart
+automatically when they finish. Hidden slides/tabs, presenter views, reduced
+motion, and PDF/print output do not run decorative loops.
+
 Slide transitions use the browser's View Transition API. Unsupported browsers
 still navigate normally. Morphing is best viewed in current Chrome or Edge;
 [Marp documents Safari limitations](https://github.com/marp-team/marp-cli/blob/v4.5.1/docs/bespoke-transitions/README.md#morphing-animations).
@@ -180,6 +186,8 @@ Async/await checks assert state-machine, code, and task-lane synchronization acr
 all three paths, including the thread-free I/O wait and the no-suspension fast path.
 Site checks exercise all packaged HTML/PDF exports and the responsive landing
 page under `/marp-demo/`.
+Decorative-motion checks wait beyond a complete loop to confirm that the visuals
+keep moving, then check hidden-slide/tab, reduced-motion, and print behavior.
 
 `ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, and `ASYNC_DECK_HTML` can target other local HTML exports.
 To run the same browser checks against a deployed site:
