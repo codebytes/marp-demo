@@ -20,12 +20,16 @@ writeFileSync(join(output, ".nojekyll"), "");
 for (const directory of ["assets", "themes"]) {
   cpSync(join(root, "slides", directory), join(output, directory), { recursive: true });
 }
+const lottiePackage = import.meta.resolve("lottie-web/package.json");
+copyFileSync(fileURLToPath(new URL("build/player/lottie_light.min.js", lottiePackage)), join(output, "assets", "lottie.min.js"));
+copyFileSync(fileURLToPath(new URL("LICENSE.md", lottiePackage)), join(output, "assets", "motion-lab", "LOTTIE-LICENSE.md"));
 
 for (const [source, html] of [
   ["Animated-CICD", "animated.html"],
   ["Agent-Context", "agent-context.html"],
   ["Async-Await", "async-await.html"],
   ["Throttling", "throttling.html"],
+  ["Motion-Lab", "motion-lab.html"],
 ]) {
   for (const [filename, options] of [
     [html, ["--bespoke.osc=false"]],

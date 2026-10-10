@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="300" viewBox="0 0 680 300" role="img" aria-labelledby="title description">
+  <title id="title">Motion Lab specimen</title>
+  <desc id="description">A, start, connects through B, shape, to C, land. The complete still used by the sprite, video, and authored-vector experiments.</desc>
+  <path id="route" d="M96 174 H192 Q220 174 220 146 V132 Q220 104 248 104 H432 Q460 104 460 132 V146 Q460 174 488 174 H584" fill="none" stroke="#8e7a8c" stroke-width="3" stroke-linecap="round"/>
+  <g id="node-a">
+    <rect x="44" y="124" width="104" height="100" rx="20" fill="#302733" stroke="#a38c9c"/>
+    <text x="96" y="172" font-family="Segoe UI, Arial, sans-serif" font-size="36" text-anchor="middle" fill="#fff4ee">A</text>
+    <text x="96" y="196" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" text-anchor="middle" fill="#c6b7c2">START</text>
+  </g>
+  <g id="node-b">
+    <rect x="288" y="54" width="104" height="100" rx="20" fill="#4a3038" stroke="#ffb3a7"/>
+    <text x="340" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="36" text-anchor="middle" fill="#ffb3a7">B</text>
+    <text x="340" y="126" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" text-anchor="middle" fill="#ffb3a7">SHAPE</text>
+  </g>
+  <g id="node-c">
+    <rect x="532" y="124" width="104" height="100" rx="20" fill="#302733" stroke="#a38c9c"/>
+    <text x="584" y="172" font-family="Segoe UI, Arial, sans-serif" font-size="36" text-anchor="middle" fill="#fff4ee">C</text>
+    <text x="584" y="196" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.6" text-anchor="middle" fill="#c6b7c2">LAND</text>
+  </g>
+</svg>

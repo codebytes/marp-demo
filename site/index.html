@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A playground for Marp presentations. Explore slide-driven throttling, .NET async/await, AI-agent context, and CI/CD demos with native transitions and readable PDFs.">
+  <meta name="description" content="A playground for Marp presentations. Compare nine animation techniques in Motion Lab, or explore throttling, .NET async/await, AI-agent context, and CI/CD demos with readable PDFs.">
   <meta name="theme-color" content="#0b111b">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236ee7ca'/%3E%3Ctext x='10' y='43' font-family='monospace' font-size='36' fill='%230b111b'%3Em/%3C/text%3E%3C/svg%3E">
   <title>marp-demo | Markdown, meet motion</title>
@@ -42,6 +42,8 @@
     .async-demo .preview { background: radial-gradient(ellipse at 40% 35%, #23435b, transparent 70%), #0c1928; }
     .throttle-demo { --mint: #ffd486; border-color: #8d7852; }
     .throttle-demo .preview { background: radial-gradient(ellipse at 40% 35%, #453923, transparent 70%), #19191e; }
+    .motion-demo { --mint: #ffb3a7; border-color: #946978; }
+    .motion-demo .preview { background: radial-gradient(ellipse at 40% 35%, #4a3038, transparent 70%), #19141e; }
     .preview { display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 32px; background: radial-gradient(ellipse at 40% 35%, #1f393e, transparent 70%), #0e1926; border-right: 1px solid var(--border); }
     .preview-label { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 11px/1.5 Consolas, monospace; letter-spacing: 1px; }
     .preview-label span:first-child { color: var(--mint); }
@@ -96,10 +98,38 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">A PLAYGROUND FOR PRESENTATIONS</p>
         <h1 id="page-title">Markdown.<br><span>Meet motion.</span></h1>
-        <p class="intro-copy">Small files. Big possibilities. Move between complete slide keyframes or take control of an interactive simulation. Explore the ideas behind the motion.</p>
+        <p class="intro-copy">Small files. Big possibilities. Compare animation techniques, move between complete slide keyframes, or take control of an interactive simulation.</p>
       </section>
 
-      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>4 DECKS &middot; HTML + PDF</span></div>
+      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>5 DECKS &middot; HTML + PDF</span></div>
+      <article class="demo motion-demo" data-deck="motion" aria-labelledby="motion-title">
+        <figure class="preview">
+          <div class="preview-label"><span>ONE DIAGRAM / NINE TECHNIQUES</span><span>DEMO / 05</span></div>
+          <svg viewBox="0 0 480 260" role="img" aria-labelledby="motion-preview-title motion-preview-desc">
+            <title id="motion-preview-title">The same three-node specimen, ready for nine kinds of motion</title>
+            <desc id="motion-preview-desc">A, start, connects through B, shape, to C, land. Compare CSS, SVG, masks, 3D, sprite frames, local video, Lottie vectors, and slide morphs without changing the subject.</desc>
+            <path d="M70 155 H132 Q152 155 152 135 V106 Q152 87 173 87 H308 Q328 87 328 107 V135 Q328 155 348 155 H410" fill="none" stroke="#97ebe1" stroke-width="3"/>
+            <g fill="#302733" stroke="#a38c9c"><rect x="28" y="115" width="84" height="80" rx="16"/><rect x="368" y="115" width="84" height="80" rx="16"/></g>
+            <rect x="198" y="47" width="84" height="80" rx="16" fill="#4a3038" stroke="#ffb3a7"/>
+            <g font-family="Segoe UI, Arial, sans-serif" text-anchor="middle" font-size="28" fill="#fff4ee"><text x="70" y="152">A</text><text x="240" y="85" fill="#ffb3a7">B</text><text x="410" y="152">C</text></g>
+            <g font-family="Segoe UI, Arial, sans-serif" text-anchor="middle" font-size="10" fill="#c6b7c2" letter-spacing="1.3"><text x="70" y="176">START</text><text x="240" y="109" fill="#ffb3a7">SHAPE</text><text x="410" y="176">LAND</text></g>
+            <g font-family="Consolas, monospace" font-size="11" fill="#c6b7c2" text-anchor="middle"><text x="240" y="232">LIVE GEOMETRY / AUTHORED VECTORS / PIXELS</text></g>
+          </svg>
+          <figcaption><strong>Same diagram. Different verbs.</strong> Compare the mechanism, not the subject.</figcaption>
+        </figure>
+        <div class="demo-copy">
+          <p class="demo-kind">ANIMATION TECHNIQUES / 12 SLIDES / NEW</p>
+          <h2 id="motion-title">Motion Lab.<br>Make the difference visible.</h2>
+          <p class="description">One small diagram, nine approaches. Compare CSS and SVG motion, masks, 3D, sprite frames, local video, Lottie vectors, and shared-element slide morphs.</p>
+          <ul class="tags" aria-label="Motion Lab features"><li>Play / pause / replay</li><li>Locally packaged media</li><li>Complete static frames</li></ul>
+          <div class="links">
+            <a class="button primary" href="motion-lab.html">Open presentation <span aria-hidden="true">&rarr;</span></a>
+            <a class="button" href="Motion-Lab.pdf" download>Download PDF</a>
+          </div>
+          <a class="jump" href="motion-lab.html#2">Jump to the first experiment <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
       <article class="demo throttle-demo" data-deck="throttle" aria-labelledby="throttle-title">
         <figure class="preview">
           <div class="preview-label"><span>SLIDES AS KEYFRAMES</span><span>DEMO / 04</span></div>
@@ -120,7 +150,7 @@
           <figcaption><strong>Every slide is a complete state.</strong> The transition supplies the motion.</figcaption>
         </figure>
         <div class="demo-copy">
-          <p class="demo-kind">API THROTTLING / 7 KEYFRAMES / NEW</p>
+          <p class="demo-kind">API THROTTLING / 7 KEYFRAMES</p>
           <h2 id="throttle-title">Throttle<br>the burst.</h2>
           <p class="description">Move requests and tokens between authored slides. Spend a burst budget, reject an arrival, refill with time, and admit a retry. No custom animation runtime.</p>
           <ul class="tags" aria-label="Throttling deck features"><li>Native morph transitions</li><li>Arrow-key driven</li><li>PDF-ready states</li></ul>
@@ -248,7 +278,7 @@
         <div><span class="detail-number">02 / TAKE CONTROL</span><h3>Present at your pace.</h3><p>Advance a keyframe with the arrow keys, or run, pause, replay, and switch scenarios in the interactive demos.</p></div>
         <div><span class="detail-number">03 / TAKE IT WITH YOU</span><h3>A readable static story.</h3><p>HTML brings the motion. PDFs keep complete diagrams and intentional snapshots, not unfinished animation frames.</p></div>
       </section>
-      <p class="format-note"><strong>HTML is the interactive version.</strong> The PDF keeps a readable, static diagram. Reduced-motion preferences are respected; use Step to explore at your own pace.</p>
+      <p class="format-note"><strong>HTML is the interactive version.</strong> PDFs keep readable, static diagrams. Reduced-motion preferences are respected; navigate the still frames or use Step in the simulation labs.</p>
     </main>
     <footer>
       <span>Built with <a href="https://marp.app/">Marp</a>. Made to be explored.</span>

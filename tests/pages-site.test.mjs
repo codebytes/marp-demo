@@ -12,6 +12,7 @@ const decks = [
   { id: "agent", html: "agent-context.html", pdf: "Agent-Context.pdf", slides: "section.ctx", count: 6, root: "[data-context-lab]", script: "agent-context.js" },
   { id: "async", html: "async-await.html", pdf: "Async-Await.pdf", slides: "section.aw", count: 4, root: "[data-async-lab]", script: "async-await.js" },
   { id: "throttle", html: "throttling.html", pdf: "Throttling.pdf", slides: "section.th", count: 7 },
+  { id: "motion", html: "motion-lab.html", pdf: "Motion-Lab.pdf", slides: "section.ml", count: 12, root: "[data-motion-technique]", script: "motion-lab.js" },
 ];
 
 before(async () => {
@@ -19,9 +20,9 @@ before(async () => {
     siteUrl = new URL(process.env.SITE_URL).href;
     assert.ok(siteUrl.endsWith("/"), "SITE_URL must end with a slash.");
   } else {
-    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md", "Async-Await.md", "Throttling.md"]);
+    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md", "Async-Await.md", "Motion-Lab.md", "Throttling.md"]);
     assert.deepEqual(readdirSync("build").filter((name) => /\.(html|pdf)$/.test(name)).sort(),
-      ["Agent-Context.pdf", "Animated-CICD.pdf", "Async-Await.pdf", "Throttling.pdf", "agent-context.html", "animated.html", "async-await.html", "index.html", "throttling.html"]);
+      ["Agent-Context.pdf", "Animated-CICD.pdf", "Async-Await.pdf", "Motion-Lab.pdf", "Throttling.pdf", "agent-context.html", "animated.html", "async-await.html", "index.html", "motion-lab.html", "throttling.html"]);
     server = createPreviewServer();
     await new Promise((resolve, reject) => {
       server.once("error", reject);
@@ -61,15 +62,16 @@ async function openSite(t, options = {}) {
   return page;
 }
 
-test("the four-deck landing page fits desktop and mobile without JavaScript", async (t) => {
+test("the five-deck landing page fits desktop and mobile without JavaScript", async (t) => {
   const page = await openSite(t, { javaScriptEnabled: false });
   assert.match(await page.title(), /marp-demo/);
-  assert.equal(await page.locator("article.demo").count(), 4);
+  assert.equal(await page.locator("article.demo").count(), 5);
   assert.equal(await page.locator("h1").count(), 1);
   assert.match(await page.locator("#demo-title").innerText(), /From commit\s+to confidence/);
   assert.match(await page.locator("#agent-title").innerText(), /From prompt\s+to action/);
   assert.match(await page.locator("#async-title").innerText(), /Await the work\.\s+Not the thread/);
   assert.match(await page.locator("#throttle-title").innerText(), /Throttle\s+the burst/);
+  assert.match(await page.locator("#motion-title").innerText(), /Motion Lab/);
   for (const width of [1440, 768, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -130,11 +132,24 @@ test("all PDFs, runtimes, and themes are included in the published package", asy
     assert.equal(bytes.subarray(0, 5).toString(), "%PDF-");
     assert.ok(bytes.length > 10_000, "The PDF must contain the rendered deck.");
   }
-  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "assets/async-await.js", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css", "themes/async-await.css", "themes/throttling.css"]) {
+  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "assets/async-await.js", "assets/motion-lab.js", "assets/lottie.min.js", "assets/motion-lab/specimen.svg", "assets/motion-lab/specimen.webm", "assets/motion-lab/specimen.lottie.json", "assets/motion-lab/sprite.png", "assets/motion-lab/LOTTIE-LICENSE.md", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css", "themes/async-await.css", "themes/throttling.css", "themes/motion-lab.css"]) {
     const asset = await page.request.get(new URL(path, siteUrl).href);
     assert.equal(asset.status(), 200, path);
     assert.ok((await asset.body()).length > 100, `${path} must not be empty.`);
   }
+});
+
+test("the Motion Lab jump link opens a readable reduced-motion experiment", async (t) => {
+  const page = await openSite(t);
+  await page.getByRole("link", { name: "Jump to the first experiment" }).click();
+  await page.waitForFunction(() => document.querySelector("[data-motion-technique]")?.dataset.enhanced === "true");
+  await page.waitForFunction(() => document.querySelector('section[id="2"]').closest("svg").classList.contains("bespoke-marp-active"));
+  await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
+  const experiment = page.locator('[data-motion-technique="css"]');
+  assert.equal(await experiment.locator(".ml-still").isVisible(), true);
+  assert.equal(await experiment.locator(".ml-controls").isVisible(), false);
+  assert.equal(await experiment.locator(".ml-node").count(), 3);
+  assert.equal(await experiment.evaluate((element) => element.getAnimations({ subtree: true }).length), 0);
 });
 
 test("the async lab link keeps the execution and state-machine panels synchronized", async (t) => {

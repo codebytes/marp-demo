@@ -3,6 +3,7 @@
 
 @import 'default';
 @import 'animated-cicd';
+@import 'motion-lab';
 
 /* Theme customization via CSS variables (Marp v4+ best practice) */
 :root {

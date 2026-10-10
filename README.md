@@ -7,10 +7,67 @@ native SVG, and small, local JavaScript experiments.
 
 | Demo | Browser presentation | Static export |
 | --- | --- | --- |
+| **Motion Lab** - one diagram, nine animation techniques, twelve slides | [HTML](https://chris-ayers.com/marp-demo/motion-lab.html) | [PDF](https://chris-ayers.com/marp-demo/Motion-Lab.pdf) |
 | **Throttle the burst** - token-bucket admission, seven slide keyframes | [HTML](https://chris-ayers.com/marp-demo/throttling.html) | [PDF](https://chris-ayers.com/marp-demo/Throttling.pdf) |
 | **Await the work. Not the thread.** - .NET async/await, four slides | [HTML](https://chris-ayers.com/marp-demo/async-await.html) | [PDF](https://chris-ayers.com/marp-demo/Async-Await.pdf) |
 | **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
 | **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
+
+## Motion Lab
+
+**Same diagram. Different verbs.** A neutral three-node specimen stays the same
+while eight in-slide experiments change how it moves. A two-slide morph then
+rearranges those same objects. This is a comparison of **animation techniques**,
+not another engineering simulation.
+
+| Slides | Technique | What actually animates |
+| --- | --- | --- |
+| 2 | CSS choreography | Shared keyframes lift/highlight A, B, then C using staggered delays. |
+| 3 | SVG stroke drawing | CSS changes `stroke-dashoffset` on a normalized SVG path. |
+| 4 | Declarative SVG motion | Native `animateMotion` carries a signal along the route. |
+| 5 | Masks/wipes | CSS moves a soft gradient mask across colored ink; labels remain visible. |
+| 6 | CSS 3D | A perspective plane tilts and B lifts along its z-axis. |
+| 7 | Sprite animation | CSS `steps(11, end)` advances a real twelve-cell PNG filmstrip. |
+| 8 | Pre-rendered video | A local, silent VP9 WebM plays the same authored gesture at 30 fps. |
+| 9 | Authored vectors / Lottie | Local Lottie JSON stores shape layers, rotation/scale keyframes, and a trimmed stroke; the SVG player interpolates them. |
+| 10-11 | Shared-element morphing | Marp matches three unique `view-transition-name` values across two complete layouts. |
+
+Each in-slide experiment starts with **Play once**, lasts about four seconds, and offers
+**Pause / Resume** and **Replay**. It does not autoplay or loop. Leaving a slide
+or hiding the tab pauses it; returning leaves it paused until you resume.
+On [the morph pair](https://chris-ayers.com/marp-demo/motion-lab.html#10),
+the right/left arrows animate the same cards forward/backward. The connector
+cross-fades: this is element-geometry morphing, **not SVG path interpolation**.
+
+CSS and native SVG perform the early examples' interpolation. Sprites and video
+are pre-rendered pixels; Lottie uses its **JavaScript vector renderer**. The shared
+script manages playback classes, separate SVG/media/player clocks, completion
+events, and visibility rather than recreating all effects in an animation loop.
+That is **not** a claim of zero JavaScript: Marp and playback controls also use it.
+CSS `animation-play-state` cannot pause SMIL, so the SVG example explicitly uses
+`pauseAnimations()` and `unpauseAnimations()`.
+
+Reduced motion, print, no-JavaScript, and presenter views keep complete static
+diagrams and hide playback controls. Printing mid-animation restores the authored
+still rather than capturing a half-drawn line, partial mask, or tilted plane.
+The PDF has all **twelve full pages**. Morphing is verified in Chromium, not claimed
+identical across browsers; Marp documents Safari's SVG/foreignObject limitations.
+Browsers without View Transitions still navigate to the complete slide states.
+VP9 decoding and Lottie feature support can also vary by browser/player. Media
+and player failures are reported, not silently presented as successful playback.
+Use the HTTP preview or Pages for the Lottie JSON, not a `file://` URL.
+Mechanisms, tradeoffs, and MDN/Marp/Lottie references are in the slides and notes.
+Marp's built-in **cover** and **slide** transitions, plus a custom **clip-path
+aperture**, make the slide boundaries part of the comparison as well.
+
+The sprite, silent video, static SVG, and vector composition are original artwork,
+not third-party downloads. `npm run motion:assets` regenerates the twelve-cell
+PNG, roughly four-second WebM, and Lottie JSON from
+`slides/assets/motion-lab/specimen.svg` and the author-time definitions in
+`scripts/generate-motion-assets.mjs`, using the locked Chromium tooling.
+The Lottie composition is hand-authored keyframe data, not an After Effects export.
+Generated assets are committed; normal builds copy them rather than re-recording.
+The clip's exact encoding/timing can vary slightly across Chromium/host versions.
 
 ## Throttle the burst
 
@@ -142,8 +199,9 @@ Slide transitions use the browser's View Transition API. Unsupported browsers
 still navigate normally. Morphing is best viewed in current Chrome or Edge;
 [Marp documents Safari limitations](https://github.com/marp-team/marp-cli/blob/v4.5.1/docs/bespoke-transitions/README.md#morphing-animations).
 All content remains understandable without animation or JavaScript.
-The throttling deck deliberately uses navigation-only morphs instead of the
-decorative loops or JavaScript playback controls used by the other demos.
+The throttling deck deliberately uses navigation-only morphs. Motion Lab uses
+manual, finite technique experiments and a navigation-only morph pair; it never
+joins the other decks' decorative loops.
 
 ## Build and preview locally
 
@@ -181,31 +239,44 @@ build/
   Animated-CICD.pdf
   async-await.html
   Async-Await.pdf
+  motion-lab.html
+  Motion-Lab.pdf
   throttling.html
   Throttling.pdf
   assets/agent-context.js
   assets/animated-cicd.js
   assets/async-await.js
+  assets/motion-lab.js
+  assets/lottie.min.js
+  assets/motion-lab/specimen.svg
+  assets/motion-lab/specimen.webm
+  assets/motion-lab/specimen.lottie.json
+  assets/motion-lab/sprite.png
+  assets/motion-lab/LOTTIE-LICENSE.md
   themes/agent-context.css
   themes/custom-default.css
   themes/animated-cicd.css
   themes/async-await.css
+  themes/motion-lab.css
   themes/throttling.css
   .nojekyll
 ```
 
 Keep this directory together when hosting or sharing the HTML: each runtime uses
-its relative `assets/` path. No external fonts, icon CDN, or
-animation library are required. Generated exports and dependencies are ignored
-by Git.
+its relative `assets/` path. No external fonts or CDN are required. Only Motion
+Lab's authored-vector example adds a player: **lottie-web 5.13.0**, locked in npm
+and packaged locally with its MIT license. Its dependency advisory check found no
+known GitHub advisories for that version when added. Generated site exports and
+dependencies are ignored by Git; the original motion media is tracked.
 The throttling HTML is self-contained and has no custom runtime asset.
 
 Build only trusted Markdown and assets: HTML and local-file access are enabled
 for these demos. Marp's current build-tool dependency tree has upstream `npm audit`
 advisories, including archive-extraction issues. Compatible fixes are captured
 in the lockfile; `npm audit fix --force` currently proposes an obsolete Marp
-release, so it is not a safe upgrade path. These Node.js dependencies are not
-deployed with the static site.
+release, so it is not a safe upgrade path. Marp's build-tool Node.js dependencies
+are not deployed; the separately pinned Lottie browser player is shipped only
+for Motion Lab.
 
 ## Check the demos
 
@@ -230,9 +301,15 @@ keep moving, then check hidden-slide/tab, reduced-motion, and print behavior.
 Throttling checks validate all seven accounting snapshots, real named morphs,
 forward/backward navigation, static states between transitions, and print/no-JS
 output.
+Motion Lab checks measure actual changing transforms, dash offsets, masks, SVG
+signal geometry, discrete sprite frames, decoded video pixels, rendered Lottie
+vectors, and named transition geometry. They cover finite completion, replay/pause,
+hidden slides/tabs, keyboard controls, transitions, static fallbacks, and slide fit.
 
 `ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, `ASYNC_DECK_HTML`, and `THROTTLE_DECK_HTML`
-can target other local HTML exports.
+can target other local HTML exports. Motion Lab checks use the HTTP preview so
+the Lottie JSON loads under normal browser origin rules; `MOTION_DECK_URL` can
+target another HTTP preview.
 To run the same browser checks against a deployed site:
 
 ```powershell
@@ -241,8 +318,9 @@ $env:ANIMATED_DECK_URL = "$($env:SITE_URL)animated.html"
 $env:AGENT_DECK_URL = "$($env:SITE_URL)agent-context.html"
 $env:ASYNC_DECK_URL = "$($env:SITE_URL)async-await.html"
 $env:THROTTLE_DECK_URL = "$($env:SITE_URL)throttling.html"
+$env:MOTION_DECK_URL = "$($env:SITE_URL)motion-lab.html"
 npm test
-Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL, Env:THROTTLE_DECK_URL
+Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL, Env:THROTTLE_DECK_URL, Env:MOTION_DECK_URL
 ```
 
 `SITE_URL` must end with `/`. Only the local preview-server checks are skipped
@@ -252,6 +330,11 @@ when testing a deployment.
 
 | File | Purpose |
 | --- | --- |
+| [slides/Motion-Lab.md](slides/Motion-Lab.md) | Shared specimen, nine techniques, two morph states, and mechanism notes. |
+| [slides/themes/motion-lab.css](slides/themes/motion-lab.css) | Scoped `ml` design, CSS keyframes/mask/3D, native morph names, and static states. |
+| [slides/assets/motion-lab.js](slides/assets/motion-lab.js) | Manual playback, CSS/SMIL/media/Lottie clocks, slide visibility and accessibility. |
+| [scripts/generate-motion-assets.mjs](scripts/generate-motion-assets.mjs) | Original frame/video production and author-time Lottie keyframes; not a slide runtime. |
+| [slides/assets/motion-lab](slides/assets/motion-lab) | Original specimen SVG, sprite, video, and Lottie composition. |
 | [slides/Throttling.md](slides/Throttling.md) | Seven complete token-bucket keyframes, stable object names, and notes. |
 | [slides/themes/throttling.css](slides/themes/throttling.css) | Frame layouts and native morph names; no timed animation. |
 | [slides/Async-Await.md](slides/Async-Await.md) | C# example, synchronized execution/state diagram, static views, and notes. |
@@ -264,13 +347,16 @@ when testing a deployment.
 | [slides/assets/animated-cicd.js](slides/assets/animated-cicd.js) | Stages, timing, and interaction. |
 | [slides/themes/animated-cicd.css](slides/themes/animated-cicd.css) | Scoped styling, motion, and print fallback. |
 | [slides/themes/custom-default.css](slides/themes/custom-default.css) | Composes Marp's default theme with the demo theme. |
-| [site/index.html](site/index.html) | The four-deck showcase page. |
+| [site/index.html](site/index.html) | The five-deck showcase page. |
 
-Keep the `default` and `animated-cicd` imports in `custom-default.css`, and pass
+Keep the `default`, `animated-cicd`, and `motion-lab` imports in `custom-default.css`, and pass
 the whole theme directory to Marp. Inline theme imports in Markdown are not a
 replacement for this composition. The agent-context, async-await, and throttling themes import
 Marp's `default` directly and do not change the CI/CD theme. All HTML exports use
 `--bespoke.osc=false` so Marp's on-screen toolbar does not cover the controls.
+Motion Lab uses the required `custom-default` theme and opt-in `ml` selectors;
+its companion stylesheet does not restyle CI/CD. Edit the common specimen
+consistently across the examples, and keep each morph name unique within a slide.
 
 ## Publish
 
@@ -292,3 +378,7 @@ The original CI/CD demo comes from
 Visual inspiration: [Awesome-Marp](https://github.com/favourhong/Awesome-Marp)
 (typographic hierarchy, section labels, and card layouts). The SVG and animation
 code are original; slide transitions and morphing use Marp's native support.
+The locally packaged [Lottie player](https://github.com/airbnb/lottie-web/tree/v5.13.0)
+is MIT licensed, Copyright (c) 2015 Bodymovin; its license is copied beside the
+published Motion Lab assets. All example media/compositions are original and
+covered by this repository's MIT license.
