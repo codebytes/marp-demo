@@ -12,6 +12,7 @@
     "build": "node scripts/build-site.mjs",
     "motion:assets": "node scripts/generate-motion-assets.mjs",
     "preview": "node scripts/preview.mjs",
+    "screenshots": "node scripts/capture-screenshots.mjs",
     "test": "node --test"
   },
   "devDependencies": {
