@@ -7,9 +7,42 @@ native SVG, and small, local JavaScript experiments.
 
 | Demo | Browser presentation | Static export |
 | --- | --- | --- |
+| **Throttle the burst** - token-bucket admission, seven slide keyframes | [HTML](https://chris-ayers.com/marp-demo/throttling.html) | [PDF](https://chris-ayers.com/marp-demo/Throttling.pdf) |
 | **Await the work. Not the thread.** - .NET async/await, four slides | [HTML](https://chris-ayers.com/marp-demo/async-await.html) | [PDF](https://chris-ayers.com/marp-demo/Async-Await.pdf) |
 | **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
 | **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
+
+## Throttle the burst
+
+This deck demonstrates a different animation technique: **each slide is a complete
+keyframe**, and **native Marp morph transitions** connect them. Use the arrow keys
+to advance or rewind. Requests and tokens retain the same `view-transition-name`
+across slides, so Marp animates changes to their position, size, and appearance.
+There is **no custom runtime, autoplay, or within-slide animation**.
+
+The seven frames illustrate a token bucket with **capacity 3**, **one new token
+per second**, **one token per admission**, and **no waiting queue**:
+
+| Frame | State |
+| --- | --- |
+| 1 | A full bucket meets four arrivals. |
+| 2 | A is admitted; two tokens remain. |
+| 3 | B and C are admitted; the bucket is empty. |
+| 4 | D is rejected with an illustrative `429` and `Retry-After: 1`. |
+| 5 | The clock reaches one second; a new token and a new client attempt D2 appear. |
+| 6 | D2 spends the refill token and is admitted. |
+| 7 | Idle time refills the bucket, but never beyond its capacity of three. |
+
+The admitted lane is **history, not concurrent execution**. Tokens replenish with
+time, not request completion. A rejected request is not secretly queued, and its
+retry is a new attempt that must pass admission again. HTTP 429/Retry-After are
+chosen responses here, not universal framework defaults or a promise that every
+retry succeeds. The clock and policy are illustrative, not live measurements.
+
+Every PDF page preserves its complete state, labels, and token accounting.
+For reusable examples of this authoring method, compare the repeated objects in
+[Throttling.md](slides/Throttling.md) with the named morph selectors in
+[throttling.css](slides/themes/throttling.css).
 
 ## Await the work. Not the thread.
 
@@ -109,6 +142,8 @@ Slide transitions use the browser's View Transition API. Unsupported browsers
 still navigate normally. Morphing is best viewed in current Chrome or Edge;
 [Marp documents Safari limitations](https://github.com/marp-team/marp-cli/blob/v4.5.1/docs/bespoke-transitions/README.md#morphing-animations).
 All content remains understandable without animation or JavaScript.
+The throttling deck deliberately uses navigation-only morphs instead of the
+decorative loops or JavaScript playback controls used by the other demos.
 
 ## Build and preview locally
 
@@ -146,6 +181,8 @@ build/
   Animated-CICD.pdf
   async-await.html
   Async-Await.pdf
+  throttling.html
+  Throttling.pdf
   assets/agent-context.js
   assets/animated-cicd.js
   assets/async-await.js
@@ -153,6 +190,7 @@ build/
   themes/custom-default.css
   themes/animated-cicd.css
   themes/async-await.css
+  themes/throttling.css
   .nojekyll
 ```
 
@@ -160,6 +198,7 @@ Keep this directory together when hosting or sharing the HTML: each runtime uses
 its relative `assets/` path. No external fonts, icon CDN, or
 animation library are required. Generated exports and dependencies are ignored
 by Git.
+The throttling HTML is self-contained and has no custom runtime asset.
 
 Build only trusted Markdown and assets: HTML and local-file access are enabled
 for these demos. Marp's current build-tool dependency tree has upstream `npm audit`
@@ -188,8 +227,12 @@ Site checks exercise all packaged HTML/PDF exports and the responsive landing
 page under `/marp-demo/`.
 Decorative-motion checks wait beyond a complete loop to confirm that the visuals
 keep moving, then check hidden-slide/tab, reduced-motion, and print behavior.
+Throttling checks validate all seven accounting snapshots, real named morphs,
+forward/backward navigation, static states between transitions, and print/no-JS
+output.
 
-`ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, and `ASYNC_DECK_HTML` can target other local HTML exports.
+`ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, `ASYNC_DECK_HTML`, and `THROTTLE_DECK_HTML`
+can target other local HTML exports.
 To run the same browser checks against a deployed site:
 
 ```powershell
@@ -197,8 +240,9 @@ $env:SITE_URL = "https://chris-ayers.com/marp-demo/"
 $env:ANIMATED_DECK_URL = "$($env:SITE_URL)animated.html"
 $env:AGENT_DECK_URL = "$($env:SITE_URL)agent-context.html"
 $env:ASYNC_DECK_URL = "$($env:SITE_URL)async-await.html"
+$env:THROTTLE_DECK_URL = "$($env:SITE_URL)throttling.html"
 npm test
-Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL
+Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL, Env:THROTTLE_DECK_URL
 ```
 
 `SITE_URL` must end with `/`. Only the local preview-server checks are skipped
@@ -208,6 +252,8 @@ when testing a deployment.
 
 | File | Purpose |
 | --- | --- |
+| [slides/Throttling.md](slides/Throttling.md) | Seven complete token-bucket keyframes, stable object names, and notes. |
+| [slides/themes/throttling.css](slides/themes/throttling.css) | Frame layouts and native morph names; no timed animation. |
 | [slides/Async-Await.md](slides/Async-Await.md) | C# example, synchronized execution/state diagram, static views, and notes. |
 | [slides/assets/async-await.js](slides/assets/async-await.js) | Three await paths and a single snapshot driving all animated panels. |
 | [slides/themes/async-await.css](slides/themes/async-await.css) | Scoped task lanes, state-machine styling, motion, and print reset. |
@@ -218,11 +264,11 @@ when testing a deployment.
 | [slides/assets/animated-cicd.js](slides/assets/animated-cicd.js) | Stages, timing, and interaction. |
 | [slides/themes/animated-cicd.css](slides/themes/animated-cicd.css) | Scoped styling, motion, and print fallback. |
 | [slides/themes/custom-default.css](slides/themes/custom-default.css) | Composes Marp's default theme with the demo theme. |
-| [site/index.html](site/index.html) | The three-deck showcase page. |
+| [site/index.html](site/index.html) | The four-deck showcase page. |
 
 Keep the `default` and `animated-cicd` imports in `custom-default.css`, and pass
 the whole theme directory to Marp. Inline theme imports in Markdown are not a
-replacement for this composition. The agent-context and async-await themes import
+replacement for this composition. The agent-context, async-await, and throttling themes import
 Marp's `default` directly and do not change the CI/CD theme. All HTML exports use
 `--bespoke.osc=false` so Marp's on-screen toolbar does not cover the controls.
 

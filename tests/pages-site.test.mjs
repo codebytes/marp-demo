@@ -11,6 +11,7 @@ const decks = [
   { id: "cicd", html: "animated.html", pdf: "Animated-CICD.pdf", slides: "section.cicd", count: 4, root: "[data-pipeline]", script: "animated-cicd.js" },
   { id: "agent", html: "agent-context.html", pdf: "Agent-Context.pdf", slides: "section.ctx", count: 6, root: "[data-context-lab]", script: "agent-context.js" },
   { id: "async", html: "async-await.html", pdf: "Async-Await.pdf", slides: "section.aw", count: 4, root: "[data-async-lab]", script: "async-await.js" },
+  { id: "throttle", html: "throttling.html", pdf: "Throttling.pdf", slides: "section.th", count: 7 },
 ];
 
 before(async () => {
@@ -18,9 +19,9 @@ before(async () => {
     siteUrl = new URL(process.env.SITE_URL).href;
     assert.ok(siteUrl.endsWith("/"), "SITE_URL must end with a slash.");
   } else {
-    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md", "Async-Await.md"]);
+    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md", "Async-Await.md", "Throttling.md"]);
     assert.deepEqual(readdirSync("build").filter((name) => /\.(html|pdf)$/.test(name)).sort(),
-      ["Agent-Context.pdf", "Animated-CICD.pdf", "Async-Await.pdf", "agent-context.html", "animated.html", "async-await.html", "index.html"]);
+      ["Agent-Context.pdf", "Animated-CICD.pdf", "Async-Await.pdf", "Throttling.pdf", "agent-context.html", "animated.html", "async-await.html", "index.html", "throttling.html"]);
     server = createPreviewServer();
     await new Promise((resolve, reject) => {
       server.once("error", reject);
@@ -60,14 +61,15 @@ async function openSite(t, options = {}) {
   return page;
 }
 
-test("the three-deck landing page fits desktop and mobile without JavaScript", async (t) => {
+test("the four-deck landing page fits desktop and mobile without JavaScript", async (t) => {
   const page = await openSite(t, { javaScriptEnabled: false });
   assert.match(await page.title(), /marp-demo/);
-  assert.equal(await page.locator("article.demo").count(), 3);
+  assert.equal(await page.locator("article.demo").count(), 4);
   assert.equal(await page.locator("h1").count(), 1);
   assert.match(await page.locator("#demo-title").innerText(), /From commit\s+to confidence/);
   assert.match(await page.locator("#agent-title").innerText(), /From prompt\s+to action/);
   assert.match(await page.locator("#async-title").innerText(), /Await the work\.\s+Not the thread/);
+  assert.match(await page.locator("#throttle-title").innerText(), /Throttle\s+the burst/);
   for (const width of [1440, 768, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -80,7 +82,7 @@ test("the three-deck landing page fits desktop and mobile without JavaScript", a
   }
 });
 
-test("all presentation links load their slides and local runtime under the project prefix", async (t) => {
+test("all presentation links load their slides and required assets under the project prefix", async (t) => {
   const page = await openSite(t);
   for (const deck of decks) {
     await page.goto(siteUrl);
@@ -88,10 +90,17 @@ test("all presentation links load their slides and local runtime under the proje
     const loaded = new URL(page.url());
     loaded.hash = "";
     assert.equal(loaded.href, new URL(deck.html, siteUrl).href);
-    await page.waitForFunction((root) => document.querySelector(root)?.dataset.enhanced === "true", deck.root);
+    await page.waitForFunction(() => document.body.getAttribute("data-bespoke-view") === "");
+    if (deck.root) {
+      await page.waitForFunction((root) => document.querySelector(root)?.dataset.enhanced === "true", deck.root);
+    }
     assert.equal(await page.locator(deck.slides).count(), deck.count);
-    const script = await page.locator(`script[src$="assets/${deck.script}"]`).getAttribute("src");
-    assert.equal(new URL(script, page.url()).href, new URL(`assets/${deck.script}`, siteUrl).href);
+    if (deck.script) {
+      const script = await page.locator(`script[src$="assets/${deck.script}"]`).getAttribute("src");
+      assert.equal(new URL(script, page.url()).href, new URL(`assets/${deck.script}`, siteUrl).href);
+    } else {
+      assert.equal(await page.locator("script[src]").count(), 0, "The keyframe deck must not require a custom runtime.");
+    }
   }
 });
 
@@ -121,7 +130,7 @@ test("all PDFs, runtimes, and themes are included in the published package", asy
     assert.equal(bytes.subarray(0, 5).toString(), "%PDF-");
     assert.ok(bytes.length > 10_000, "The PDF must contain the rendered deck.");
   }
-  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "assets/async-await.js", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css", "themes/async-await.css"]) {
+  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "assets/async-await.js", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css", "themes/async-await.css", "themes/throttling.css"]) {
     const asset = await page.request.get(new URL(path, siteUrl).href);
     assert.equal(asset.status(), 200, path);
     assert.ok((await asset.body()).length > 100, `${path} must not be empty.`);

@@ -25,6 +25,7 @@ for (const [source, html] of [
   ["Animated-CICD", "animated.html"],
   ["Agent-Context", "agent-context.html"],
   ["Async-Await", "async-await.html"],
+  ["Throttling", "throttling.html"],
 ]) {
   for (const [filename, options] of [
     [html, ["--bespoke.osc=false"]],
@@ -48,4 +49,4 @@ for (const [source, html] of [
   }
 }
 
-console.log("Built all three presentations (HTML + PDF) and their local assets in build.");
+console.log("Built all presentations (HTML + PDF) and their local assets in build.");
