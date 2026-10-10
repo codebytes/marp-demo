@@ -10,6 +10,7 @@ let siteUrl;
 const decks = [
   { id: "cicd", html: "animated.html", pdf: "Animated-CICD.pdf", slides: "section.cicd", count: 4, root: "[data-pipeline]", script: "animated-cicd.js" },
   { id: "agent", html: "agent-context.html", pdf: "Agent-Context.pdf", slides: "section.ctx", count: 6, root: "[data-context-lab]", script: "agent-context.js" },
+  { id: "async", html: "async-await.html", pdf: "Async-Await.pdf", slides: "section.aw", count: 4, root: "[data-async-lab]", script: "async-await.js" },
 ];
 
 before(async () => {
@@ -17,9 +18,9 @@ before(async () => {
     siteUrl = new URL(process.env.SITE_URL).href;
     assert.ok(siteUrl.endsWith("/"), "SITE_URL must end with a slash.");
   } else {
-    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md"]);
+    assert.deepEqual(readdirSync("slides").filter((name) => name.endsWith(".md")).sort(), ["Agent-Context.md", "Animated-CICD.md", "Async-Await.md"]);
     assert.deepEqual(readdirSync("build").filter((name) => /\.(html|pdf)$/.test(name)).sort(),
-      ["Agent-Context.pdf", "Animated-CICD.pdf", "agent-context.html", "animated.html", "index.html"]);
+      ["Agent-Context.pdf", "Animated-CICD.pdf", "Async-Await.pdf", "agent-context.html", "animated.html", "async-await.html", "index.html"]);
     server = createPreviewServer();
     await new Promise((resolve, reject) => {
       server.once("error", reject);
@@ -59,13 +60,14 @@ async function openSite(t, options = {}) {
   return page;
 }
 
-test("the two-deck landing page fits desktop and mobile without JavaScript", async (t) => {
+test("the three-deck landing page fits desktop and mobile without JavaScript", async (t) => {
   const page = await openSite(t, { javaScriptEnabled: false });
   assert.match(await page.title(), /marp-demo/);
-  assert.equal(await page.locator("article.demo").count(), 2);
+  assert.equal(await page.locator("article.demo").count(), 3);
   assert.equal(await page.locator("h1").count(), 1);
   assert.match(await page.locator("#demo-title").innerText(), /From commit\s+to confidence/);
   assert.match(await page.locator("#agent-title").innerText(), /From prompt\s+to action/);
+  assert.match(await page.locator("#async-title").innerText(), /Await the work\.\s+Not the thread/);
   for (const width of [1440, 768, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -78,7 +80,7 @@ test("the two-deck landing page fits desktop and mobile without JavaScript", asy
   }
 });
 
-test("both presentation links load their slides and local runtime under the project prefix", async (t) => {
+test("all presentation links load their slides and local runtime under the project prefix", async (t) => {
   const page = await openSite(t);
   for (const deck of decks) {
     await page.goto(siteUrl);
@@ -107,7 +109,7 @@ test("the packaged simulation can step through approval and release", async (t) 
   assert.equal(await page.locator("[data-pipeline]").getAttribute("data-state"), "complete");
 });
 
-test("both PDFs, runtimes, and themes are included in the published package", async (t) => {
+test("all PDFs, runtimes, and themes are included in the published package", async (t) => {
   const page = await openSite(t);
   for (const deck of decks) {
     const href = await page.locator(`[data-deck="${deck.id}"]`).getByRole("link", { name: "Download PDF" }).getAttribute("href");
@@ -119,11 +121,24 @@ test("both PDFs, runtimes, and themes are included in the published package", as
     assert.equal(bytes.subarray(0, 5).toString(), "%PDF-");
     assert.ok(bytes.length > 10_000, "The PDF must contain the rendered deck.");
   }
-  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css"]) {
+  for (const path of ["assets/animated-cicd.js", "assets/agent-context.js", "assets/async-await.js", "themes/custom-default.css", "themes/animated-cicd.css", "themes/agent-context.css", "themes/async-await.css"]) {
     const asset = await page.request.get(new URL(path, siteUrl).href);
     assert.equal(asset.status(), 200, path);
     assert.ok((await asset.body()).length > 100, `${path} must not be empty.`);
   }
+});
+
+test("the async lab link keeps the execution and state-machine panels synchronized", async (t) => {
+  const page = await openSite(t);
+  await page.getByRole("link", { name: "Jump to the async lab" }).click();
+  await page.waitForFunction(() => document.querySelector("[data-async-lab]")?.dataset.enhanced === "true");
+  await page.waitForFunction(() => document.querySelector('section[id="3"]').closest("svg").classList.contains("bespoke-marp-active"));
+  await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
+  for (let step = 0; step < 3; step += 1) await page.locator('[data-async-action="step"]').click();
+  assert.equal(await page.locator("[data-async-lab]").getAttribute("data-step"), "waiting");
+  assert.equal(await page.locator('[data-async-node="suspended"]').getAttribute("data-state"), "active");
+  assert.equal(await page.locator('[data-async-lane="cpu"]').getAttribute("data-status"), "yielded");
+  assert.equal(await page.locator('[data-async-lane="read"]').getAttribute("data-status"), "pending");
 });
 
 test("the project-prefix link opens the context lab and preserves its tool-result sequence", async (t) => {

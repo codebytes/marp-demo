@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A playground for Marp presentations. Explore animated AI-agent context and CI/CD demos, native slide transitions, interactive playback, and readable PDFs.">
+  <meta name="description" content="A playground for Marp presentations. Explore animated .NET async/await, AI-agent context, and CI/CD demos with interactive diagrams and readable PDFs.">
   <meta name="theme-color" content="#0b111b">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236ee7ca'/%3E%3Ctext x='10' y='43' font-family='monospace' font-size='36' fill='%230b111b'%3Em/%3C/text%3E%3C/svg%3E">
   <title>marp-demo | Markdown, meet motion</title>
@@ -38,6 +38,8 @@
     .demo + .demo { margin-top: 26px; }
     .context-demo { --mint: #c4afff; border-color: #655375; }
     .context-demo .preview { background: radial-gradient(ellipse at 40% 35%, #39304c, transparent 70%), #161322; }
+    .async-demo { --mint: #8bcdff; border-color: #496d8a; }
+    .async-demo .preview { background: radial-gradient(ellipse at 40% 35%, #23435b, transparent 70%), #0c1928; }
     .preview { display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 32px; background: radial-gradient(ellipse at 40% 35%, #1f393e, transparent 70%), #0e1926; border-right: 1px solid var(--border); }
     .preview-label { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font: 11px/1.5 Consolas, monospace; letter-spacing: 1px; }
     .preview-label span:first-child { color: var(--mint); }
@@ -92,10 +94,41 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">A PLAYGROUND FOR PRESENTATIONS</p>
         <h1 id="page-title">Markdown.<br><span>Meet motion.</span></h1>
-        <p class="intro-copy">Small files. Big possibilities. Put a delivery platform in motion, watch an AI agent's context take shape, and explore what a presentation can do.</p>
+        <p class="intro-copy">Small files. Big possibilities. Follow an async method, assemble an agent's context, or put a delivery platform in motion.</p>
       </section>
 
-      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>2 DECKS &middot; HTML + PDF</span></div>
+      <div class="collection-label"><span>EXPLORE THE EXPERIMENTS</span><span>3 DECKS &middot; HTML + PDF</span></div>
+      <article class="demo async-demo" data-deck="async" aria-labelledby="async-title">
+        <figure class="preview">
+          <div class="preview-label"><span>ASYNC / AWAIT IN MOTION</span><span>DEMO / 03</span></div>
+          <svg viewBox="0 0 480 260" role="img" aria-labelledby="async-preview-title async-preview-desc">
+            <title id="async-preview-title">Execution and an async state machine side by side</title>
+            <desc id="async-preview-desc">A method runs, saves state while an I/O task is incomplete, and resumes without dedicating a waiting thread. The state diagram tracks the same progression.</desc>
+            <g font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#afc1d6" letter-spacing="1"><text x="12" y="27">EXECUTION</text><text x="282" y="27">STATE MACHINE</text></g>
+            <path d="M18 75 H93 M174 75 H242" stroke="#8bcdff" stroke-width="4"/>
+            <path d="M93 75 H174" stroke="#58738c" stroke-width="2" stroke-dasharray="4 7"/>
+            <path d="M18 164 H242" stroke="#ffd18a" stroke-width="3" stroke-dasharray="7 6"/>
+            <g font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#eaf4ff"><text x="18" y="108">Run</text><text x="100" y="108">Suspend</text><text x="190" y="108">Resume</text><text x="18" y="192" fill="#ffd18a">I/O proceeds independently</text></g>
+            <path d="M95 77 V133 H174 V77" fill="none" stroke="#ffd18a" stroke-width="1.5"/>
+            <path d="M357 83 V107 M357 158 V182" stroke="#8bcdff" stroke-width="2"/>
+            <g fill="#162a3d" stroke="#496d8a"><rect x="290" y="48" width="134" height="35" rx="9"/><rect x="290" y="107" width="134" height="51" rx="9"/><rect x="290" y="182" width="134" height="35" rx="9"/></g>
+            <g font-family="Segoe UI, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#eaf4ff"><text x="357" y="70">Running</text><text x="357" y="129" fill="#ffd18a">Save + suspend</text><text x="357" y="147" font-size="10" fill="#afc1d6">Awaiter + resume point</text><text x="357" y="204">Continue + finish</text></g>
+          </svg>
+          <figcaption><strong>Two synchronized views.</strong> One logical async method.</figcaption>
+        </figure>
+        <div class="demo-copy">
+          <p class="demo-kind">.NET / 4 SLIDES / NEW</p>
+          <h2 id="async-title">Await the work.<br>Not the thread.</h2>
+          <p class="description">Follow execution, I/O, and two task lifetimes while a state-machine diagram highlights the same steps. Compare suspension, an already-completed await, and a failed read.</p>
+          <ul class="tags" aria-label="Async await deck features"><li>Side-by-side state machine</li><li>3 scenarios</li><li>C# example</li></ul>
+          <div class="links">
+            <a class="button primary" href="async-await.html">Open presentation <span aria-hidden="true">&rarr;</span></a>
+            <a class="button" href="Async-Await.pdf" download>Download PDF</a>
+          </div>
+          <a class="jump" href="async-await.html#3">Jump to the async lab <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
       <article class="demo context-demo" data-deck="agent" aria-labelledby="agent-title">
         <figure class="preview">
           <div class="preview-label"><span>CONTEXT IN MOTION</span><span>DEMO / 02</span></div>
@@ -117,7 +150,7 @@
           <figcaption><strong>Not everything it knows.</strong> What this turn needs.</figcaption>
         </figure>
         <div class="demo-copy">
-          <p class="demo-kind">AI AGENTS / 6 SLIDES / NEW</p>
+          <p class="demo-kind">AI AGENTS / 6 SLIDES</p>
           <h2 id="agent-title">From prompt<br>to action.</h2>
           <p class="description">Watch instructions frame a request, skills load on demand, and tool results flow back into context. Explore two scenarios in a hands-on context lab.</p>
           <ul class="tags" aria-label="Agent deck features"><li>Transitions + morphing</li><li>Context lab</li><li>Static PDF</li></ul>
@@ -178,7 +211,7 @@
       </article>
 
       <section class="details" aria-label="Inside the experiments">
-        <div><span class="detail-number">01 / FOLLOW</span><h3>Motion with a purpose.</h3><p>Follow the artifact or the context. Animated relationships and native Marp transitions make the ideas visible.</p></div>
+        <div><span class="detail-number">01 / FOLLOW</span><h3>Motion with a purpose.</h3><p>Follow execution, context, or an artifact. Animated relationships and native Marp transitions make the ideas visible.</p></div>
         <div><span class="detail-number">02 / TAKE CONTROL</span><h3>Present at your pace.</h3><p>Run, pause, replay, step, or switch scenarios. The interactive demos give you room to explain each stage.</p></div>
         <div><span class="detail-number">03 / TAKE IT WITH YOU</span><h3>A readable static story.</h3><p>HTML brings the motion. PDFs keep complete diagrams and intentional snapshots, not unfinished animation frames.</p></div>
       </section>

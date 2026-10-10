@@ -7,8 +7,38 @@ native SVG, and small, local JavaScript experiments.
 
 | Demo | Browser presentation | Static export |
 | --- | --- | --- |
+| **Await the work. Not the thread.** - .NET async/await, four slides | [HTML](https://chris-ayers.com/marp-demo/async-await.html) | [PDF](https://chris-ayers.com/marp-demo/Async-Await.pdf) |
 | **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
 | **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
+
+## Await the work. Not the thread.
+
+A synchronized .NET async/await animation with **execution and task lifetimes on
+the left** and a **conceptual compiler state machine on the right**. The
+[async lab on slide 3](https://chris-ayers.com/marp-demo/async-await.html#3) highlights
+the active C# line, CPU activity, the awaited `Task<string>`, the method's returned
+`Task<int>`, saved state, and the corresponding diagram node/edge from one snapshot.
+
+Use **Run / Pause / Resume**, **Step**, **Replay**, and **1x / 2x** speed. Compare:
+
+| Read task | What the animation demonstrates |
+| --- | --- |
+| **I/O pending** | Save the awaiter/resume point, return control, then resume after the read completes. No dedicated thread waits for this I/O. |
+| **Already complete** | Skip suspension entirely. This example finishes synchronously and returns an already-completed count task. |
+| **I/O fails** | Resume, observe the error at `GetResult`, and fault the method's returned task. |
+
+The code counts the characters in `"hello"` (result: `5`). The sample was checked
+with .NET 10, including its pending, completed, and faulted task behavior. The deck
+itself is a browser-only simulation: it does not run .NET, fetch data, or report
+real timings. The state diagram is conceptual, not an exact generated field dump.
+The execution lane does not claim a fixed thread identity or a forced thread hop;
+context capture, scheduling races, and cancellation are outside its scope.
+
+PDF/print/no-JS/presenter views keep the code, both task descriptions, and a neutral
+all-paths state diagram, regardless of the selected scenario or playback position.
+The [C# await reference](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/await)
+and the [task-based async model](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/task-asynchronous-programming-model)
+ground the story; further sources and caveats are in the speaker notes.
 
 ## From prompt to action
 
@@ -61,7 +91,7 @@ users start manually; Step works without moving particles.
 The PDF, print view, and JavaScript-disabled view retain the readable static SVG.
 This is a simulation, not a connection to real CI/CD infrastructure.
 
-## Presenting either deck
+## Presenting the decks
 
 Use the arrow keys to navigate. Operate interactive controls in the **audience
 window**: presenter and next-slide previews remain static, and playback state is
@@ -108,11 +138,15 @@ build/
   Agent-Context.pdf
   animated.html
   Animated-CICD.pdf
+  async-await.html
+  Async-Await.pdf
   assets/agent-context.js
   assets/animated-cicd.js
+  assets/async-await.js
   themes/agent-context.css
   themes/custom-default.css
   themes/animated-cicd.css
+  themes/async-await.css
   .nojekyll
 ```
 
@@ -142,18 +176,21 @@ hidden slides/tabs, reduced motion, keyboard controls, and print/presenter/no-JS
 fallbacks. Agent-context checks exercise native transitions and morphing, card
 visibility, definitions-before-results, both scenarios, playback, keyboard
 controls, visibility/reduced-motion behavior, and deterministic static fallbacks.
-Site checks exercise both packaged HTML/PDF exports and the responsive landing
+Async/await checks assert state-machine, code, and task-lane synchronization across
+all three paths, including the thread-free I/O wait and the no-suspension fast path.
+Site checks exercise all packaged HTML/PDF exports and the responsive landing
 page under `/marp-demo/`.
 
-`ANIMATED_DECK_HTML` and `AGENT_DECK_HTML` can target other local HTML exports.
+`ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, and `ASYNC_DECK_HTML` can target other local HTML exports.
 To run the same browser checks against a deployed site:
 
 ```powershell
 $env:SITE_URL = "https://chris-ayers.com/marp-demo/"
 $env:ANIMATED_DECK_URL = "$($env:SITE_URL)animated.html"
 $env:AGENT_DECK_URL = "$($env:SITE_URL)agent-context.html"
+$env:ASYNC_DECK_URL = "$($env:SITE_URL)async-await.html"
 npm test
-Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL
+Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL
 ```
 
 `SITE_URL` must end with `/`. Only the local preview-server checks are skipped
@@ -163,6 +200,9 @@ when testing a deployment.
 
 | File | Purpose |
 | --- | --- |
+| [slides/Async-Await.md](slides/Async-Await.md) | C# example, synchronized execution/state diagram, static views, and notes. |
+| [slides/assets/async-await.js](slides/assets/async-await.js) | Three await paths and a single snapshot driving all animated panels. |
+| [slides/themes/async-await.css](slides/themes/async-await.css) | Scoped task lanes, state-machine styling, motion, and print reset. |
 | [slides/Agent-Context.md](slides/Agent-Context.md) | Agent-context story, accessible visuals, transitions, notes, and static snapshots. |
 | [slides/assets/agent-context.js](slides/assets/agent-context.js) | Context-lab scenarios, sequencing, and playback. |
 | [slides/themes/agent-context.css](slides/themes/agent-context.css) | Scoped visual compositions, morph naming, motion, and print styles. |
@@ -170,12 +210,12 @@ when testing a deployment.
 | [slides/assets/animated-cicd.js](slides/assets/animated-cicd.js) | Stages, timing, and interaction. |
 | [slides/themes/animated-cicd.css](slides/themes/animated-cicd.css) | Scoped styling, motion, and print fallback. |
 | [slides/themes/custom-default.css](slides/themes/custom-default.css) | Composes Marp's default theme with the demo theme. |
-| [site/index.html](site/index.html) | The two-deck showcase page. |
+| [site/index.html](site/index.html) | The three-deck showcase page. |
 
 Keep the `default` and `animated-cicd` imports in `custom-default.css`, and pass
 the whole theme directory to Marp. Inline theme imports in Markdown are not a
-replacement for this composition. The agent-context theme imports Marp's
-`default` directly and does not change the CI/CD theme. Both HTML exports use
+replacement for this composition. The agent-context and async-await themes import
+Marp's `default` directly and do not change the CI/CD theme. All HTML exports use
 `--bespoke.osc=false` so Marp's on-screen toolbar does not cover the controls.
 
 ## Publish
