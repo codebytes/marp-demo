@@ -11,6 +11,7 @@ if (!existsSync(join(root, "build", "index.html"))) {
 }
 
 const covers = [
+  ["style-lab", "style-lab.html"],
   ["motion-lab", "motion-lab.html"],
   ["throttling", "throttling.html"],
   ["async-await", "async-await.html"],
@@ -30,6 +31,8 @@ const techniques = [
   { slide: 9, technique: "vector", label: "Authored vectors / Lottie", at: 2000 },
 ];
 
+const styles = ["House style", "Risograph zine", "Swiss poster", "Neo-brutalist", "Sketchnote", "Blueprint", "Broadsheet", "LaTeX Beamer"];
+
 const server = createPreviewServer();
 await new Promise((resolve, reject) => {
   server.once("error", reject);
@@ -46,7 +49,7 @@ async function settle(page) {
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
-async function capture(path, { slide, motion = "reduce", scale = 1.5, prepare, element, clip } = {}) {
+async function capture(path, { slide, motion = "reduce", scale = 1.5, prepare, element, clip, frozen = false } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: scale, reducedMotion: motion });
   try {
     const page = await context.newPage();
@@ -63,7 +66,8 @@ async function capture(path, { slide, motion = "reduce", scale = 1.5, prepare, e
     }
     await settle(page);
     if (prepare) await prepare(page);
-    await settle(page);
+    if (frozen) await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    else await settle(page);
     const image = element ? await page.locator(element).screenshot()
       : clip ? await page.screenshot({ fullPage: true, clip: await clip(page) }) : await page.screenshot();
     if (errors.length) throw new Error(`${path}: ${errors.join("; ")}`);
@@ -101,12 +105,31 @@ async function pauseAt(page, technique, at) {
   }, at);
 }
 
-async function grid(cells) {
+// Freezes the live restyle partway through its View Transition, so the README shows the morph itself.
+async function morphAt(page, button, time) {
+  await page.evaluate(() => {
+    const start = document.startViewTransition.bind(document);
+    document.startViewTransition = (...args) => (window.styleMorph = start(...args));
+  });
+  await page.getByRole("button", { name: button }).click();
+  await page.evaluate(async (ms) => {
+    await window.styleMorph.ready;
+    const animations = document.getAnimations();
+    const morph = animations.filter((animation) => animation.effect.pseudoElement?.includes("(sl-live-"));
+    for (const animation of morph) {
+      animation.pause();
+      animation.currentTime = ms;
+    }
+    await Promise.all(animations.filter((animation) => !morph.includes(animation)).map((animation) => animation.finished));
+  }, time);
+}
+
+async function grid(cells, { columns = 3, background = "#1c1720", color = "#c6b7c2" } = {}) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 });
   try {
     await page.setContent(`<!doctype html><meta charset="utf-8"><style>
-      body { margin: 0; padding: 28px 32px 30px; background: #1c1720; color: #c6b7c2; font: 600 15px "Segoe UI", Arial, sans-serif; letter-spacing: 0.02em; }
-      main { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px 20px; }
+      body { margin: 0; padding: 28px 32px 30px; background: ${background}; color: ${color}; font: 600 15px "Segoe UI", Arial, sans-serif; letter-spacing: 0.02em; }
+      main { display: grid; grid-template-columns: repeat(${columns}, 1fr); gap: 22px 20px; }
       figure { margin: 0; }
       img { display: block; width: 100%; }
       figcaption { margin-top: 9px; }
@@ -149,6 +172,13 @@ try {
     },
   }));
   for (const [name, html] of covers) await save(`${name}-cover`, await capture(html, { slide: 1, scale: 0.5 }));
+
+  const styleCells = [];
+  for (const [index, label] of styles.entries()) styleCells.push({ label, image: await capture("style-lab.html", { slide: index + 3 }) });
+  await save("style-lab-styles", await grid(styleCells, { columns: 4, background: "#e9e8e4", color: "#55524b" }));
+  await save("style-lab-live", await capture("style-lab.html", {
+    slide: 11, motion: "no-preference", frozen: true, prepare: (page) => morphAt(page, "Swiss", 330),
+  }));
 
   const cells = [];
   for (const { slide, technique, label, at } of techniques) {

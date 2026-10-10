@@ -3,17 +3,82 @@
 A playground for presentations built with [Marp](https://marp.app/): Markdown,
 native SVG, and small, local JavaScript experiments.
 
-[![The marp-demo showcase page: "Markdown. Meet motion." above the Motion Lab card](docs/screenshots/showcase.webp)](https://chris-ayers.com/marp-demo/)
+[![The marp-demo showcase page: "Markdown. Meet motion." above the Style Lab card](docs/screenshots/showcase.webp)](https://chris-ayers.com/marp-demo/)
 
 **[Explore the site](https://chris-ayers.com/marp-demo/)**
 
 | Preview | Demo | Browser presentation | Static export |
 | --- | --- | --- | --- |
+| <a href="https://chris-ayers.com/marp-demo/style-lab.html"><img src="docs/screenshots/style-lab-cover.webp" width="240" alt="Style Lab title slide: Same words. Different worlds. in four typefaces above eight style swatches."></a> | **Style Lab** - one slide of HTML, eight visual styles, thirteen slides | [HTML](https://chris-ayers.com/marp-demo/style-lab.html) | [PDF](https://chris-ayers.com/marp-demo/Style-Lab.pdf) |
 | <a href="https://chris-ayers.com/marp-demo/motion-lab.html"><img src="docs/screenshots/motion-lab-cover.webp" width="240" alt="Motion Lab title slide: Same diagram. Different verbs."></a> | **Motion Lab** - one diagram, nine animation techniques, twelve slides | [HTML](https://chris-ayers.com/marp-demo/motion-lab.html) | [PDF](https://chris-ayers.com/marp-demo/Motion-Lab.pdf) |
 | <a href="https://chris-ayers.com/marp-demo/throttling.html"><img src="docs/screenshots/throttling-cover.webp" width="240" alt="Throttle the burst, frame 1: a full three-token bucket meets four arriving requests."></a> | **Throttle the burst** - token-bucket admission, seven slide keyframes | [HTML](https://chris-ayers.com/marp-demo/throttling.html) | [PDF](https://chris-ayers.com/marp-demo/Throttling.pdf) |
 | <a href="https://chris-ayers.com/marp-demo/async-await.html"><img src="docs/screenshots/async-await-cover.webp" width="240" alt="Await the work. Not the thread. title slide with a run, suspend, and resume timeline."></a> | **Await the work. Not the thread.** - .NET async/await, four slides | [HTML](https://chris-ayers.com/marp-demo/async-await.html) | [PDF](https://chris-ayers.com/marp-demo/Async-Await.pdf) |
 | <a href="https://chris-ayers.com/marp-demo/agent-context.html"><img src="docs/screenshots/agent-context-cover.webp" width="240" alt="From prompt to action title slide with instruction, skill, prompt, and tool-result cards."></a> | **From prompt to action** - agent context, six slides | [HTML](https://chris-ayers.com/marp-demo/agent-context.html) | [PDF](https://chris-ayers.com/marp-demo/Agent-Context.pdf) |
 | <a href="https://chris-ayers.com/marp-demo/animated.html"><img src="docs/screenshots/animated-cicd-cover.webp" width="240" alt="From commit to confidence title slide with a commit, verify, and release path."></a> | **From commit to confidence** - CI/CD, four slides | [HTML](https://chris-ayers.com/marp-demo/animated.html) | [PDF](https://chris-ayers.com/marp-demo/Animated-CICD.pdf) |
+
+## Style Lab
+
+**Same words. Different worlds.** In the spirit of the
+[CSS Zen Garden](https://www.csszengarden.com/), every style slide repeats one
+byte-identical HTML specimen: a kicker, headline, dek, three steps, a stat, and a
+note. Only one class on its stage changes. The house style of the other decks is
+the control; seven departures change type, color, texture, layout, and motion,
+not just the palette.
+
+[![Eight versions of the same "Good ideas travel in small steps." slide: house style, risograph zine, Swiss poster, neo-brutalist, sketchnote, blueprint, broadsheet, and LaTeX Beamer](docs/screenshots/style-lab-styles.webp)](https://chris-ayers.com/marp-demo/style-lab.html#3)
+
+*The same markup on all eight style slides.*
+
+| Slide | Style | What the CSS does |
+| --- | --- | --- |
+| 3 | House style | Dark panels, system UI type, thin borders, and one mint accent: the control. |
+| 4 | Risograph zine | Two fluorescent inks overprint with `mix-blend-mode: multiply`; the headline's second, misregistered ink comes from `attr(data-text)`. Halftone dots and grain are CSS gradients and an SVG noise filter. |
+| 5 | Swiss poster | A strict column grid, a heavy grotesque, signal red, and the stat set as one large circle. |
+| 6 | Neo-brutalist | Loud flat color, thick outlines, hard `box-shadow` offsets, CSS counters, and a rotated sticker. |
+| 7 | Sketchnote | Dot-grid paper, marker lettering, a thick `text-decoration` highlighter, slightly rotated cards, and a taped sticky note. |
+| 8 | Blueprint | A drafting grid, numbered callouts, a dimension line, and a title block; labels such as `QTY` are generated content. |
+| 9 | Editorial broadsheet | A blackletter nameplate, a news serif, ruled columns, ears, and generated dashes and end mark. |
+| 10 | LaTeX Beamer | A frame-title bar, a theorem block, triangle bullets, a footline, and Computer Modern Sans. |
+
+Each style slide also has its own entrance and leaves through a different Marp
+transition: star, wipe, drop, flip, clockwise, cover, push, and fade.
+Decorative labels and glyphs use CSS generated content with empty alternative
+text, so assistive technology reads only the shared words. Every style's text
+colors meet WCAG AA contrast.
+
+On [slide 11](https://chris-ayers.com/marp-demo/style-lab.html#11), eight
+buttons restyle the same specimen live. The runtime swaps the stage class inside
+`document.startViewTransition()`, and temporary `view-transition-name` values let
+each element move from its old box to its new one while the rendering
+cross-fades. The names exist only during a switch, so Marp's slide transitions
+are unaffected.
+
+[![The live restyle slide mid-morph from house style to Swiss poster: the headline, steps, and red stat circle are still moving into place beside eight style buttons](docs/screenshots/style-lab-live.webp)](https://chris-ayers.com/marp-demo/style-lab.html#11)
+
+*Caught mid-morph from the house style to the Swiss poster.*
+
+Slide 12 maps every official place a Marp style can live: theme CSS (`@theme`,
+`@import`, pagination, Marp Core's `@size` and `@auto-scaling`), Markdown
+directives and `<style scoped>`, built-in color classes, and custom transitions.
+Levers this deck actually uses are checked, and the slide demonstrates its own
+`<style scoped>` rule. For finished themes, start with
+[awesome-marp](https://github.com/marp-team/awesome-marp),
+[Marp Community Themes](https://rnd195.github.io/marp-community-themes/), the
+[Marp Template Library](https://yoanbernabeu.github.io/MARP-Template-Library/),
+and the [built-in themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md).
+
+Type is part of each style, so the deck bundles **17 unmodified WOFF2 files from
+11 open font families** (about 0.5 MB) with their licenses. The HTML and PDF
+render the same fonts on any machine, including the Linux Pages runner, with no
+font CDN. Textures are CSS gradients, blend modes, and SVG data URIs; the deck
+contains no raster images. The PDF has all **thirteen pages** at about 1.7 MB:
+it omits the film grain, which Chromium would rasterize on every page, and keeps
+the authored house style on the live slide.
+
+Reduced motion switches styles instantly and skips entrances. Print,
+presenter, and no-JavaScript views keep the authored house style and hide the
+buttons, which appear only in the audience window. The live morph is verified in
+Chromium; browsers without View Transitions still switch styles.
 
 ## Motion Lab
 
@@ -228,7 +293,8 @@ still navigate normally. Morphing is best viewed in current Chrome or Edge;
 All content remains understandable without animation or JavaScript.
 The throttling deck deliberately uses navigation-only morphs. Motion Lab uses
 manual, finite technique experiments and a navigation-only morph pair; it never
-joins the other decks' decorative loops.
+joins the other decks' decorative loops. Style Lab's entrances play once per
+visit, and its live restyle runs only when you choose a style.
 
 ## Build and preview locally
 
@@ -268,6 +334,8 @@ build/
   Async-Await.pdf
   motion-lab.html
   Motion-Lab.pdf
+  style-lab.html
+  Style-Lab.pdf
   throttling.html
   Throttling.pdf
   assets/agent-context.js
@@ -280,17 +348,22 @@ build/
   assets/motion-lab/specimen.lottie.json
   assets/motion-lab/sprite.png
   assets/motion-lab/LOTTIE-LICENSE.md
+  assets/style-lab.js
+  assets/style-lab/fonts/*.woff2      (17 files)
+  assets/style-lab/fonts/LICENSE.md
   themes/agent-context.css
   themes/custom-default.css
   themes/animated-cicd.css
   themes/async-await.css
   themes/motion-lab.css
+  themes/style-lab.css
   themes/throttling.css
   .nojekyll
 ```
 
 Keep this directory together when hosting or sharing the HTML: each runtime uses
-its relative `assets/` path. No external fonts or CDN are required. Only Motion
+its relative `assets/` path. No external fonts or CDN are required; Style Lab's
+fonts ship beside it with their SIL Open Font License and Apache 2.0 texts. Only Motion
 Lab's authored-vector example adds a player: **lottie-web 5.13.0**, locked in npm
 and packaged locally with its MIT license. Its dependency advisory check found no
 known GitHub advisories for that version when added. Generated site exports and
@@ -332,12 +405,23 @@ Motion Lab checks measure actual changing transforms, dash offsets, masks, SVG
 signal geometry, discrete sprite frames, decoded video pixels, rendered Lottie
 vectors, and named transition geometry. They cover finite completion, replay/pause,
 hidden slides/tabs, keyboard controls, transitions, static fallbacks, and slide fit.
+Style Lab checks confirm that every style slide carries the identical specimen,
+that each style renders its bundled fonts rather than platform fallbacks, and that
+text never overflows or collides. They compute WCAG AA contrast for every style,
+including each gradient's brightest wash and the text on the risograph inks, which
+must also stay clear of the overprints. They confirm that every entrance rule
+reaches a real part with its intended delay and ends exactly in the authored still.
+They also run the live morph from the mouse and keyboard, where arrow keys still
+change slides from a focused button. Reduced motion, transitions, print, presenter,
+and no-JS fallbacks are covered, as are PDF pages and size and a license entry for
+every font file.
 README checks confirm every captured screenshot is shown, exists, and has alt text.
 
 `ANIMATED_DECK_HTML`, `AGENT_DECK_HTML`, `ASYNC_DECK_HTML`, and `THROTTLE_DECK_HTML`
 can target other local HTML exports. Motion Lab checks use the HTTP preview so
 the Lottie JSON loads under normal browser origin rules; `MOTION_DECK_URL` can
-target another HTTP preview.
+target another HTTP preview. Style Lab checks also use the HTTP preview, for its
+fonts; `STYLE_DECK_URL` can target another one.
 To run the same browser checks against a deployed site:
 
 ```powershell
@@ -347,8 +431,9 @@ $env:AGENT_DECK_URL = "$($env:SITE_URL)agent-context.html"
 $env:ASYNC_DECK_URL = "$($env:SITE_URL)async-await.html"
 $env:THROTTLE_DECK_URL = "$($env:SITE_URL)throttling.html"
 $env:MOTION_DECK_URL = "$($env:SITE_URL)motion-lab.html"
+$env:STYLE_DECK_URL = "$($env:SITE_URL)style-lab.html"
 npm test
-Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL, Env:THROTTLE_DECK_URL, Env:MOTION_DECK_URL
+Remove-Item Env:SITE_URL, Env:ANIMATED_DECK_URL, Env:AGENT_DECK_URL, Env:ASYNC_DECK_URL, Env:THROTTLE_DECK_URL, Env:MOTION_DECK_URL, Env:STYLE_DECK_URL
 ```
 
 `SITE_URL` must end with `/`. Only the local preview-server checks are skipped
@@ -369,13 +454,21 @@ succeeds. Labs are advanced with **Step** under reduced motion, so each image sh
 a fixed state rather than a moment of timed playback. Motion Lab experiments are
 paused, then their clocks are moved to two seconds (3.2 seconds for the SVG signal,
 which B covers at two). The video plays to that frame instead, because the preview
-server does not support seeking. Fonts and video timing can differ slightly by host.
+server does not support seeking. The Style Lab grid composes its eight style
+slides, and the live capture pauses the restyle's view-transition animations
+330 ms into a switch to Swiss, so the image shows the morph in motion with crisp
+text. Fonts and video timing can differ slightly by host.
 The screenshots are tracked in Git but are not part of the published site.
 
 ## Edit the three layers
 
 | File | Purpose |
 | --- | --- |
+| [slides/Style-Lab.md](slides/Style-Lab.md) | The shared specimen on eight style slides, the live restyle, the Marp levers map, and sourced notes. |
+| [slides/themes/style-lab.css](slides/themes/style-lab.css) | Bundled `@font-face` rules, the gallery frame, all eight styles, entrances, and print rules. |
+| [slides/assets/style-lab.js](slides/assets/style-lab.js) | Font preloading, entrance activation, and the live View Transition restyle. |
+| [slides/assets/style-lab/fonts](slides/assets/style-lab/fonts) | Unmodified open-licensed WOFF2 files and their license texts. |
+| [PRODUCT.md](PRODUCT.md) | Audience, purpose, and design constraints for the demos, including WCAG AA contrast. |
 | [slides/Motion-Lab.md](slides/Motion-Lab.md) | Shared specimen, nine techniques, two morph states, and mechanism notes. |
 | [slides/themes/motion-lab.css](slides/themes/motion-lab.css) | Scoped `ml` design, CSS keyframes/mask/3D, native morph names, and static states. |
 | [slides/assets/motion-lab.js](slides/assets/motion-lab.js) | Manual playback, CSS/SMIL/media/Lottie clocks, slide visibility and accessibility. |
@@ -393,12 +486,12 @@ The screenshots are tracked in Git but are not part of the published site.
 | [slides/assets/animated-cicd.js](slides/assets/animated-cicd.js) | Stages, timing, and interaction. |
 | [slides/themes/animated-cicd.css](slides/themes/animated-cicd.css) | Scoped styling, motion, and print fallback. |
 | [slides/themes/custom-default.css](slides/themes/custom-default.css) | Composes Marp's default theme with the demo theme. |
-| [site/index.html](site/index.html) | The five-deck showcase page. |
-| [scripts/capture-screenshots.mjs](scripts/capture-screenshots.mjs) | README screenshots: fixed lab states, paused Motion Lab clocks, and WebP output. |
+| [site/index.html](site/index.html) | The six-deck showcase page. |
+| [scripts/capture-screenshots.mjs](scripts/capture-screenshots.mjs) | README screenshots: fixed lab states, paused Motion Lab clocks, the Style Lab grid and frozen morph, and WebP output. |
 
 Keep the `default`, `animated-cicd`, and `motion-lab` imports in `custom-default.css`, and pass
 the whole theme directory to Marp. Inline theme imports in Markdown are not a
-replacement for this composition. The agent-context, async-await, and throttling themes import
+replacement for this composition. The agent-context, async-await, style-lab, and throttling themes import
 Marp's `default` directly and do not change the CI/CD theme. All HTML exports use
 `--bespoke.osc=false` so Marp's on-screen toolbar does not cover the controls.
 Motion Lab uses the required `custom-default` theme and opt-in `ml` selectors;
@@ -429,3 +522,14 @@ The locally packaged [Lottie player](https://github.com/airbnb/lottie-web/tree/v
 is MIT licensed, Copyright (c) 2015 Bodymovin; its license is copied beside the
 published Motion Lab assets. All example media/compositions are original and
 covered by this repository's MIT license.
+
+Style Lab's premise follows Dave Shea's [CSS Zen Garden](https://www.csszengarden.com/).
+Its styles are original CSS: the Beamer style is inspired by LaTeX Beamer and the
+community themes collected in [awesome-marp](https://github.com/marp-team/awesome-marp),
+but copies no theme code. The bundled fonts keep their own licenses, listed per
+file with full texts in
+[slides/assets/style-lab/fonts/LICENSE.md](slides/assets/style-lab/fonts/LICENSE.md):
+Archivo, Barlow Condensed, Bricolage Grotesque, CMU Sans Serif, Dela Gothic One,
+Hanken Grotesk, JetBrains Mono, Kalam, Old Standard TT, and UnifrakturMaguntia
+under the SIL Open Font License 1.1, and Special Elite under the Apache License
+2.0. They are not covered by this repository's MIT license.
