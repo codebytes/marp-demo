@@ -1,5 +1,6 @@
 ---
 marp: true
+lang: en
 theme: async-await
 paginate: true
 title: Await the work. Not the thread.
@@ -119,7 +120,7 @@ https://learn.microsoft.com/dotnet/csharp/language-reference/operators/await
 
 ## Execution on the left. State on the right.
 
-<div class="aw-lab" data-async-lab aria-label="Synchronized async await and state-machine simulation">
+<div class="aw-lab" data-async-lab role="group" aria-label="Synchronized async await and state-machine simulation">
   <div class="aw-lab-heading"><b>COUNTASYNC / INPUT "hello"</b><span class="aw-static">STATIC MAP / ALL PATHS</span><span class="aw-dynamic" data-async-status>READY</span></div>
   <div class="aw-lab-grid">
     <div class="aw-execution">

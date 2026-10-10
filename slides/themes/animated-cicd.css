@@ -166,8 +166,9 @@ section.cicd .cicd-code-caption { border-top: 1px solid var(--cicd-border); font
 @keyframes cicd-signal { to { stroke-dashoffset: -466; } }
 @keyframes cicd-entrance { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
+/* All motion on a slide ends within five seconds of it appearing (WCAG 2.2.2), so nothing here may loop forever. */
 @media (prefers-reduced-motion: no-preference) {
-  section.cicd-live .cicd-hero-signal { animation: cicd-signal 4s linear infinite; }
+  section.cicd-live .cicd-hero-signal { animation: cicd-signal 4s linear; }
   .cicd-live .cicd-contract { animation: cicd-entrance 600ms both; }
   .cicd-live .cicd-contract:nth-child(2) { animation-delay: 120ms; }
   .cicd-live .cicd-contract:nth-child(3) { animation-delay: 240ms; }

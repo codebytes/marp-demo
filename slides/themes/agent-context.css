@@ -206,9 +206,10 @@ section.ctx .ctx-sources { color: var(--ctx-muted); font-size: 12px; margin-top:
 @keyframes ctx-evidence-arrives { from { background-color: #38544b; } to { background-color: #252033; } }
 @keyframes ctx-noise-recedes { from { background-color: #41374a; } to { background-color: #282431; } }
 
+/* All motion on a slide ends within five seconds of it appearing (WCAG 2.2.2), so nothing here may loop forever. */
 @media (prefers-reduced-motion: no-preference) {
   section.ctx-active .ctx-cover-window { animation: ctx-window-open 1.1s both; }
-  section.ctx-active .ctx-float { animation: ctx-float-in 2.6s both, ctx-float-idle 3.2s ease-in-out 2.6s infinite; }
+  section.ctx-active .ctx-float { animation: ctx-float-in 2.6s both, ctx-float-idle 1.7s ease-in-out 2.6s; }
   section.ctx-active .ctx-float-skill { animation-delay: 250ms, 2850ms; }
   section.ctx-active .ctx-float-result { animation-delay: 600ms, 3200ms; }
   section.ctx-active .ctx-enter { animation: ctx-arrive 850ms both; }
@@ -216,9 +217,9 @@ section.ctx .ctx-sources { color: var(--ctx-muted); font-size: 12px; margin-top:
   section.ctx-active .ctx-enter:nth-child(3) { animation-delay: 360ms; }
   section.ctx-active .ctx-enter:nth-child(4) { animation-delay: 540ms; }
   section.ctx-active .ctx-skill-expanded { animation-delay: 650ms; }
-  section.ctx-active .ctx-selected-skill { animation: ctx-arrive 850ms 180ms both, ctx-skill-glow 2.8s 600ms infinite; }
-  section.ctx-active .ctx-flow-out { animation: ctx-flow 4.2s linear infinite both; }
-  section.ctx-active .ctx-flow-back { animation: ctx-flow 4.2s 2.1s linear infinite both; }
+  section.ctx-active .ctx-selected-skill { animation: ctx-arrive 850ms 180ms both, ctx-skill-glow 2.8s 600ms; }
+  section.ctx-active .ctx-flow-out { animation: ctx-flow 3.2s linear both; }
+  section.ctx-active .ctx-flow-back { animation: ctx-flow 3.2s 1.6s linear both; }
   section.ctx-active .ctx-context-row[data-fresh="true"] { animation: ctx-evidence-arrives 700ms; }
   section.ctx-active .ctx-bar-noise { animation: ctx-noise-recedes 1.4s 1.2s both; }
 }

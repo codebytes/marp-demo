@@ -379,7 +379,8 @@ test("keyboard playback keeps focus without hijacking deck navigation", async (t
   assert.equal(await root.locator('[data-motion-action="replay"]').evaluate((button) => button === document.activeElement), true);
   await page.keyboard.press("Enter");
   await waitForState(root, "running");
-  await blurAndNavigate(page, "ArrowRight", 3);
+  await page.keyboard.press("ArrowRight");
+  await waitForSlide(page, 3);
   await waitForState(root, "paused");
 });
 

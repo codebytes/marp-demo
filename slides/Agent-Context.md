@@ -1,5 +1,6 @@
 ---
 marp: true
+lang: en
 theme: agent-context
 paginate: true
 title: From prompt to action
@@ -20,7 +21,7 @@ transition: fade 550ms
 <p class="ctx-tags"><span>Instructions</span><span>Skills</span><span>Tools</span></p>
 </div>
 
-<div class="ctx-constellation" aria-label="Instructions, a prompt, a selected skill, and tool results form the context for a model turn">
+<div class="ctx-constellation" role="group" aria-label="Instructions, a prompt, a selected skill, and tool results form the context for a model turn">
   <div class="ctx-orbit ctx-orbit-one" aria-hidden="true"></div>
   <div class="ctx-orbit ctx-orbit-two" aria-hidden="true"></div>
   <div class="ctx-float ctx-float-instructions"><span>01 / INSTRUCTIONS</span>Boundaries + conventions</div>
@@ -183,7 +184,7 @@ Source: https://modelcontextprotocol.io/specification/2025-11-25/server/tools
 
 <p class="ctx-subtitle">Choose a task. Follow the inputs. Nothing here calls a real model or tool.</p>
 
-<div class="ctx-lab" data-context-lab aria-label="Interactive agent-context simulation">
+<div class="ctx-lab" data-context-lab role="group" aria-label="Interactive agent-context simulation">
   <div class="ctx-lab-header"><b>CONTEXT LAB</b><span class="ctx-static">STATIC EXAMPLE / KEYBOARD SEARCH</span><span class="ctx-dynamic" data-context-state>READY</span></div>
   <div class="ctx-lab-grid">
     <div class="ctx-working-window">

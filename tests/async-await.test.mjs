@@ -246,7 +246,7 @@ test("document visibility and reduced-motion changes suspend running playback", 
   assert.equal(await page.locator(".aw-active").count(), 0);
 });
 
-test("keyboard playback stays on the simulation slide", async (t) => {
+test("Space and Enter keep playback on the simulation slide; arrow keys still change slides", async (t) => {
   const page = await openDeck(t);
   await action(page, "toggle").focus();
   await page.keyboard.press("Space");
@@ -257,6 +257,8 @@ test("keyboard playback stays on the simulation slide", async (t) => {
   await page.keyboard.press("Enter");
   assert.equal(await lab(page).getAttribute("data-step"), "inspect");
   assert.equal(new URL(page.url()).hash, "#3");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForFunction(() => location.hash === "#4", null, { timeout: 3000 });
 });
 
 test("print is an identical all-paths diagram even after failure; no-JS and presenter views stay static", async (t) => {

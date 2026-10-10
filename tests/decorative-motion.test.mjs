@@ -8,18 +8,18 @@ import { chromium } from "playwright";
 const scenes = [
   {
     name: "async cover signals", file: "async-await.html", env: "ASYNC_DECK", slide: 1,
-    loops: [
+    effects: [
       { selector: ".aw-cover-beam", name: "aw-beam", property: "stroke-dashoffset" },
       { selector: ".aw-cover-io", name: "aw-io", property: "stroke-dashoffset" },
     ],
   },
   {
     name: "CI/CD cover signal", file: "animated.html", env: "ANIMATED_DECK", slide: 1,
-    loops: [{ selector: ".cicd-hero-signal", name: "cicd-signal", property: "stroke-dashoffset" }],
+    effects: [{ selector: ".cicd-hero-signal", name: "cicd-signal", property: "stroke-dashoffset" }],
   },
   {
     name: "context cover cards", file: "agent-context.html", env: "AGENT_DECK", slide: 1,
-    loops: [
+    effects: [
       { selector: ".ctx-float-instructions", name: "ctx-float-idle", property: "translate" },
       { selector: ".ctx-float-skill", name: "ctx-float-idle", property: "translate" },
       { selector: ".ctx-float-result", name: "ctx-float-idle", property: "translate" },
@@ -27,11 +27,11 @@ const scenes = [
   },
   {
     name: "selected-skill glow", file: "agent-context.html", env: "AGENT_DECK", slide: 3,
-    loops: [{ selector: ".ctx-selected-skill", name: "ctx-skill-glow", property: "box-shadow" }],
+    effects: [{ selector: ".ctx-selected-skill", name: "ctx-skill-glow", property: "box-shadow" }],
   },
   {
     name: "tool request/result flow", file: "agent-context.html", env: "AGENT_DECK", slide: 4,
-    loops: [
+    effects: [
       { selector: ".ctx-flow-out", name: "ctx-flow", property: "stroke-dashoffset" },
       { selector: ".ctx-flow-back", name: "ctx-flow", property: "stroke-dashoffset" },
     ],
@@ -51,20 +51,21 @@ async function waitForSlide(page, slide) {
   await page.waitForFunction(() => !document.documentElement.matches(":active-view-transition"));
 }
 
-async function expectStopped(page, loops) {
+async function expectStopped(page, effects) {
   await page.waitForFunction((items) => items.every(({ selector }) =>
-    document.querySelector(selector).getAnimations().length === 0), loops);
+    document.querySelector(selector).getAnimations().length === 0), effects);
 }
 
-async function expectRunning(page, loops) {
+async function expectPlaying(page, effects) {
   await page.waitForFunction((items) => items.every(({ selector, name }) =>
     document.querySelector(selector).getAnimations().some((animation) =>
-      animation.animationName === name && animation.playState === "running"
-      && animation.effect.getTiming().iterations === Infinity)), loops);
+      animation.animationName === name && animation.playState === "running")), effects);
 }
 
+// WCAG 2.2.2: motion that starts by itself and lasts more than five seconds needs a pause control,
+// so every effect plays when its slide appears and then rests in the reduced-motion still.
 for (const scene of scenes) {
-  test(`${scene.name} loop beyond their first cycle and stop when not visible`, async (t) => {
+  test(`${scene.name} move when their slide appears and settle within five seconds`, async (t) => {
     const html = process.env[`${scene.env}_HTML`] ? resolve(process.env[`${scene.env}_HTML`]) : resolve("build", scene.file);
     const remote = process.env[`${scene.env}_URL`];
     if (!remote) assert.ok(existsSync(html), "Run npm run build before testing decorative motion.");
@@ -78,56 +79,59 @@ for (const scene of scenes) {
     t.after(() => assert.deepEqual(errors, [], "Decorative motion must not throw browser errors."));
     await page.goto(url.href);
     await waitForSlide(page, scene.slide);
-    await expectRunning(page, scene.loops);
+    await expectPlaying(page, scene.effects);
 
-    const infinite = await page.locator(`section[id="${scene.slide}"]`).evaluate((section) =>
-      [...new Set(section.getAnimations({ subtree: true })
-        .filter((animation) => animation.effect.getTiming().iterations === Infinity)
-        .map((animation) => animation.animationName))].sort());
-    assert.deepEqual(infinite, [...new Set(scene.loops.map((loop) => loop.name))].sort(),
-      "Only the intended decorative effects loop; content entrances must not repeat.");
+    const lengths = await page.locator(`section[id="${scene.slide}"]`).evaluate((section) =>
+      section.getAnimations({ subtree: true }).map((animation) => [animation.animationName, animation.effect.getComputedTiming().endTime]));
+    for (const [name, end] of lengths) assert.ok(end <= 5000, `${name} moves for ${end} ms; every effect must settle within five seconds.`);
 
-    await page.waitForFunction((loops) => loops.every(({ selector, name }) =>
+    await page.waitForFunction((items) => items.every(({ selector, name }) =>
       document.querySelector(selector).getAnimations().some((animation) =>
         animation.animationName === name && animation.playState === "running"
-        && animation.effect.getComputedTiming().currentIteration >= 1)), scene.loops, { timeout: 15000 });
-    const values = () => page.evaluate((loops) => loops.map(({ selector, property }) =>
-      getComputedStyle(document.querySelector(selector)).getPropertyValue(property)), scene.loops);
+        && animation.currentTime >= animation.effect.getTiming().delay)), scene.effects);
+    const values = () => page.evaluate((items) => items.map(({ selector, property }) =>
+      getComputedStyle(document.querySelector(selector)).getPropertyValue(property)), scene.effects);
     const first = await values();
     await page.waitForTimeout(160);
-    assert.notDeepEqual(await values(), first, "The rendered properties must keep moving after one complete cycle.");
+    assert.notDeepEqual(await values(), first, "The decorative effects must visibly move after the slide appears.");
+    await page.waitForFunction((items) => items.every(({ selector, name }) =>
+      !document.querySelector(selector).getAnimations().some((animation) =>
+        animation.animationName === name && animation.playState === "running")), scene.effects, { timeout: 6000 });
+    const rest = await values();
+    await page.waitForTimeout(300);
+    assert.deepEqual(await values(), rest, "Once settled, the decorative effects must stay still.");
     const overflow = await page.locator(`section[id="${scene.slide}"]`).evaluate((section) =>
       [section.scrollWidth - section.clientWidth, section.scrollHeight - section.clientHeight]);
-    assert.ok(overflow.every((amount) => amount <= 2), `Looping content must stay inside the slide: ${overflow}`);
+    assert.ok(overflow.every((amount) => amount <= 2), `Moving content must stay inside the slide: ${overflow}`);
 
     await page.evaluate(() => {
       Object.defineProperty(document, "hidden", { configurable: true, value: true });
       document.dispatchEvent(new Event("visibilitychange"));
     });
-    await expectStopped(page, scene.loops);
+    await expectStopped(page, scene.effects);
     await page.evaluate(() => {
       delete document.hidden;
       document.dispatchEvent(new Event("visibilitychange"));
     });
-    await expectRunning(page, scene.loops);
+    await expectPlaying(page, scene.effects);
 
     await page.emulateMedia({ media: "print" });
-    await expectStopped(page, scene.loops);
+    await expectStopped(page, scene.effects);
     await page.emulateMedia({ media: "screen", reducedMotion: "reduce" });
-    await expectStopped(page, scene.loops);
+    await expectStopped(page, scene.effects);
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    await expectRunning(page, scene.loops);
+    await expectPlaying(page, scene.effects);
 
     await page.keyboard.press("ArrowRight");
     await waitForSlide(page, scene.slide + 1);
-    await expectStopped(page, scene.loops);
+    await expectStopped(page, scene.effects);
     await page.keyboard.press("ArrowLeft");
     await waitForSlide(page, scene.slide);
-    await expectRunning(page, scene.loops);
+    await expectPlaying(page, scene.effects);
 
     url.searchParams.set("view", "presenter");
     await page.goto(url.href);
     await page.waitForFunction(() => document.body.getAttribute("data-bespoke-view") === "presenter");
-    await expectStopped(page, scene.loops);
+    await expectStopped(page, scene.effects);
   });
 }

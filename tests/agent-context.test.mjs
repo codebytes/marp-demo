@@ -259,7 +259,7 @@ test("hidden documents and a reduced-motion preference change suspend playback",
   assert.equal(await page.locator(".ctx-active").count(), 0);
 });
 
-test("keyboard playback controls do not advance the presentation", async (t) => {
+test("Space and Enter press playback controls without advancing; arrow keys still change slides", async (t) => {
   const page = await openDeck(t);
   await action(page, "toggle").focus();
   await page.keyboard.press("Space");
@@ -270,6 +270,8 @@ test("keyboard playback controls do not advance the presentation", async (t) => 
   await page.keyboard.press("Enter");
   assert.equal(await phase(page), "1");
   assert.equal(new URL(page.url()).hash, "#5");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForFunction(() => location.hash === "#6", null, { timeout: 3000 });
 });
 
 test("print always restores the authored snapshot; no-JS and presenter views keep complete diagrams", async (t) => {

@@ -282,25 +282,29 @@ This is a simulation, not a connection to real CI/CD infrastructure.
 
 ## Presenting the decks
 
-Use the arrow keys to navigate. Operate interactive controls in the **audience
+Use the arrow keys to navigate. Space and Enter press a focused lab button, and
+arrow keys and presentation clickers still change slides after you press one.
+Operate interactive controls in the **audience
 window**: presenter and next-slide previews remain static, and playback state is
 not synchronized between windows. Running playback is suspended while a slide
 or the browser tab is hidden. Reduced-motion preferences disable the custom
 motion; Marp reduces slide transitions to a fade.
 
 Decorative cover signals, floating context cards, the selected-skill glow, and
-the tool call/result flow loop while their slide is active and visible. Text/card
-entrances still play once per entry, and interactive simulations do not restart
-automatically when they finish. Hidden slides/tabs, presenter views, reduced
-motion, and PDF/print output do not run decorative loops.
+the tool call/result flow play when their slide appears and settle within five
+seconds, so no motion runs long enough to need a pause control
+([WCAG 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide)).
+Text/card entrances also play once per entry, and interactive simulations do not
+restart automatically when they finish. Hidden slides/tabs, presenter views,
+reduced motion, and PDF/print output show the still.
 
 Slide transitions use the browser's View Transition API. Unsupported browsers
 still navigate normally. Morphing is best viewed in current Chrome or Edge;
 [Marp documents Safari limitations](https://github.com/marp-team/marp-cli/blob/v4.5.1/docs/bespoke-transitions/README.md#morphing-animations).
 All content remains understandable without animation or JavaScript.
 The throttling deck deliberately uses navigation-only morphs. Motion Lab uses
-manual, finite technique experiments and a navigation-only morph pair; it never
-joins the other decks' decorative loops. Style Lab's entrances play once per
+manual, finite technique experiments and a navigation-only morph pair, with no
+decorative motion of its own. Style Lab's entrances play once per
 visit, and its live restyle runs only when you choose a style.
 
 ## Build and preview locally
@@ -368,6 +372,10 @@ build/
   .nojekyll
 ```
 
+Every deck sets `lang: en` in its front matter. Without it, Marp labels the
+exports with the build machine's locale, which is `C` on the Linux runner. PDFs
+are exported with bookmarks (`--pdf-outlines`).
+
 Keep this directory together when hosting or sharing the HTML: each runtime uses
 its relative `assets/` path. No external fonts or CDN are required; Style Lab's
 fonts ship beside it with their SIL Open Font License and Apache 2.0 texts. Only Motion
@@ -402,9 +410,11 @@ controls, visibility/reduced-motion behavior, and deterministic static fallbacks
 Async/await checks assert state-machine, code, and task-lane synchronization across
 all three paths, including the thread-free I/O wait and the no-suspension fast path.
 Site checks exercise all packaged HTML/PDF exports and the responsive landing
-page under `/marp-demo/`.
-Decorative-motion checks wait beyond a complete loop to confirm that the visuals
-keep moving, then check hidden-slide/tab, reduced-motion, and print behavior.
+page under `/marp-demo/`. They also confirm that every deck and PDF declares
+English, that labelled groups have roles, and that every PDF has bookmarks.
+Decorative-motion checks confirm that each effect moves when its slide appears
+and settles within five seconds, then check hidden-slide/tab, reduced-motion,
+and print behavior.
 Throttling checks validate all seven accounting snapshots, real named morphs,
 forward/backward navigation, static states between transitions, and print/no-JS
 output.

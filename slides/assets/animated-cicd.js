@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  const deckKeys = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"]);
   const stages = [
     { nodes: ["commit"], edges: [], duration: 1100, message: "Commit received. A new delivery run begins." },
     { nodes: ["build"], edges: ["commit-build"], duration: 1900, message: "Build workers compile the application and reuse cached layers." },
@@ -183,8 +184,17 @@
     root.querySelector("[data-speed]").addEventListener("change", (event) => {
       speed = Number(event.target.value);
     });
-    for (const event of ["keydown", "touchstart", "touchend"]) {
-      controls.addEventListener(event, (e) => e.stopPropagation());
+    // Keys stay with the controls, but navigation keys on a focused button release it and go back to the
+    // deck: Marp ignores every key aimed at a button, and presenters expect arrows and clickers to work.
+    controls.addEventListener("keydown", (event) => {
+      event.stopPropagation();
+      if (event.target.tagName !== "BUTTON" || !deckKeys.has(event.key) || event.altKey || event.ctrlKey || event.metaKey) return;
+      event.preventDefault();
+      event.target.blur();
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: event.key, code: event.code, shiftKey: event.shiftKey, bubbles: true, cancelable: true }));
+    });
+    for (const name of ["touchstart", "touchend"]) {
+      controls.addEventListener(name, (event) => event.stopPropagation());
     }
 
     return {

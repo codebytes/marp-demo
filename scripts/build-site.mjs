@@ -34,7 +34,7 @@ for (const [source, html] of [
 ]) {
   for (const [filename, options] of [
     [html, ["--bespoke.osc=false"]],
-    [`${source}.pdf`, ["--pdf", "--allow-local-files"]],
+    [`${source}.pdf`, ["--pdf", "--pdf-outlines", "--allow-local-files"]],
   ]) {
     const result = spawnSync(process.execPath, [
       marp, "--no-stdin", "--html",
